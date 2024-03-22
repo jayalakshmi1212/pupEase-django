@@ -1,0 +1,75 @@
+
+{% extends 'partials/base.html'%}
+{% load static %}
+{%  block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Product Detail</title>
+   
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include your custom CSS stylesheets here -->
+    <style>
+        /* Add your custom styles here */
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.name }}">
+            </div>
+            <div class="col-md-6">
+                <h2>{{ product.name }}</h2>
+                <p>Category: {{ product.category }}</p>
+                <p>Price: ${{ product.price }}</p>
+                {% if product.discounted_price %}
+                    <p>Discounted Price: ${{ product.discounted_price }}</p>
+                {% endif %}
+                <p>Stock: {{ product.stock }}</p>
+                <p>Created Date: {{ product.created_date }}</p>
+                <p>Description: {{ product.description }}</p>
+    
+                <!-- Display either "Go to Cart" button or "Add to Cart" button based on product_in_cart variable -->
+                {% if product_in_cart %}
+                <a href="{% url 'cart:cart' %}" class="btn btn-primary">Go to Cart</a>
+            {% else %}
+                <div class="row">
+                    <div class="col">
+                        <form method="post" action="{% url 'cart:add_cart' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            {% if product.stock <= 0 %}
+                                <span><h5 class="text-danger">Out of Stock</h5></span>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                            {% endif %}
+                        </form>
+                    </div>
+                    <div class="col">
+                        <form method="post" action="{% url 'store:add_to_wishlist' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" class="btn btn-danger">Add to wishlist</button> <!-- Heart icon button for adding to wishlist -->
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    
+<!-- Include your JavaScript libraries here -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Include your custom scripts here -->
+<script>
+    // Add your custom JavaScript code here
+</script>
+
+</body>
+</html>
+{% endblock content %}

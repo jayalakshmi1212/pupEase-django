@@ -1,0 +1,229 @@
+
+
+
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+{{user}}'s cart
+{% endblock %}
+
+{% block content %}
+<body>
+
+
+    <!--=========Main start==========-->
+    <main class="main">  
+    <!--===================--> 
+
+        <!--================== Delivery Address =====================-->
+        
+            <div class="page-header breadcrumb-wrap">
+                <div class="container">
+                    <div class="breadcrumb">
+                        <a href="index.html" rel="nofollow">Home</a>
+                        <span></span> Shop
+                        <span></span> Shipping Address
+                    </div>
+                </div>
+            </div>
+            <section class="mt-50 mb-50">
+                <div class="container">
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-md-5">
+                                {% csrf_token %}
+                                <!--============= Listing Address ============-->
+                                
+            
+                            {% if addresses %}
+                            <div class="mt-5">
+                                <h3 class="fs-5 mt-5  mb-4 border-bottom pb-4">Select Shipping Address <span><a href="#createaddress"id="createAddressLink"><u>  Or Create New</u></a></span></h3>
+                                <!-- Checkout Panel Information-->
+                                <form method="post" action="{% url 'cart:checkout' %}">
+                                    {% csrf_token %}
+                                  <div class="row">
+                                <!-- saved addresses-->
+                                    {% for add in addresses %}
+                                    
+                                        <div class="form-check form-group form-check-custom form-radio-custom form-radio-highlight mb-3">
+                                            <span class="d-flex justify-content-between align-items-start">
+                                                <span class="col-7">
+                                                    <h5 class="mb-0 fw-bolder d-block text-secondary">{{ add.name }}</h5>
+                                                    <span class="small fw-bolder text-uppercase">{{ add.phone }}</span><br>
+                                                    <span class="small fw-bolder text-uppercase">{{ add.address_line_1 }},  {{ add.address_line_2 }}</span><br>
+                                                    <span class="small fw-bolder text-uppercase">{{ add.city }}  {{ add.state }}</span><br>
+                                                    <span class="fw-bolder">pin: {{ add.pincode }}</span> 
+                                                    <input type="hidden" name="selected_address_id" value="{{ add.id }}">
+                                                </span>
+                                                <span class="col-4"> {# Set width to 30% #}
+                                                    <style>
+                                                        .custom-button {
+                                                            border: 1px solid black;
+                                                            background-color: transparent;
+                                                            color: black;
+                                                            transition: background-color 0.3s, color 0.3s;
+                                                        }
+                                                        
+                                                        .custom-button:hover {
+                                                            background-color: black;
+                                                            color: #ffff;
+                                                        }
+                                                        </style>
+                                                    <button class="btn w-100 custom-button">select</button>
+                                               
+                                                </span>
+                                            </span>
+                                        {% comment %} </label> {% endcomment %}
+                                    
+                                    </div>
+                                  
+                                    
+                                    {% endfor %} 
+                                </div>
+                            </div>
+                        </form>
+                            {% endif %}
+                        </div>
+                        <!--============= Listing Address ============-->
+                        <div class="col-md-6 create-address-column">
+                            <h3 class="fs-5 mt-5  mb-4 border-bottom pb-4">Create Shipping Address</h3>
+                            <form action="" method="post" name="add-address-form">
+                                <div class="row">
+                                    {% if form.errors %}
+                                    {% for error in form.errors %}{{error}}{% endfor %}
+                                    {% endif %}
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label>Full Name <span class="required">*</span></label>
+                                            {{ form.name }}
+                                            {% if form.errors.name %}
+                                                <label class="text-danger">{{ form.errors.name.0 }}</label>
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Phone Number <span class="required">*</span></label>
+                                            <div class="input-group ">
+                                                <div class="input-group-prepend ">
+                                                    <span class="input-group-text h-100">+91</span>
+                                                </div>
+                                                <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Enter your phone number">
+                                            </div>
+                                            {% if form.errors.phone_number %}
+                                                <label class="text-danger">{{ form.errors.phone_number.0 }}</label>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Address line1 <span class="required">*</span></label>
+                                        {{ form.address_line_1 }}
+                                        {% if form.errors.address_line_1 %}
+                                            <label class="text-danger">{{ form.errors.address_line_1.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Address line 2<span class="required">*</span></label>
+                                        {{ form.address_line_2 }}
+                                        {% if form.errors.address_line_2 %}
+                                            <label class="text-danger">{{ form.errors.address_line_2.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>Country<span class="required">*</span></label>
+                                        {{ form.country }}
+                                        {% if form.errors.country %}
+                                            <label class="text-danger">{{ form.errors.country.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>State<span class="required">*</span></label>
+                                        {{ form.state }}
+                                        {% if form.errors.state %}
+                                            <label class="text-danger">{{ form.errors.state.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>City<span class="required">*</span></label>
+                                        {{ form.city }}
+                                        {% if form.errors.city %}
+                                            <label class="text-danger">{{ form.errors.city.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>PIN<span class="required">*</span></label>
+                                        {{ form.pincode }}
+                                        {% if form.errors.pincode %}
+                                            <label class="text-danger">{{ form.errors.pincode.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="">
+                                        <h5>Additional information</h5>
+                                    </div>
+                                    <div class="form-group mb-30">
+                                        <textarea rows="5" placeholder="Order notes" name="order_note"></textarea>
+                                    </div>
+                                    <!-- Add other address fields here as needed -->
+                                    <!-- ... -->
+                                </div>
+                            </form>
+                            <div class="text-center">
+                                <button type = "submit" name="submit" class="btn btn-block">Select Payment option</button>
+                            </div>                
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        <!--================== Delivery Address =====================-->
+                    
+
+    <!--========= Main end ==========-->
+    </main>
+    <!--===================--> 
+
+
+
+
+<!--========= Vendor JS==========-->
+<script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+<script src="{% static 'assets/js/plugins/counterup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+<script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+<script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+<!--===================-->
+
+<!--========= Template  JS ==========-->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+<!--===================-->
+<script>
+    $(document).ready(function() {
+        // Hide the create address column initially
+        $(".create-address-column").hide();
+
+        // Toggle the visibility when "Create New" is clicked
+        $("#createAddressLink").click(function() {
+            $(".create-address-column").toggle();
+        });
+    });
+</script>
+   
+</body>
+
+{% endblock content %}

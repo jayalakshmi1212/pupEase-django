@@ -1,0 +1,41 @@
+<!-- templates/carts/invoice_template.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Invoice</title>
+    <!-- Add any necessary CSS styles here -->
+</head>
+<body>
+    <h1>Order Invoice</h1>
+    <p>Order Number: {{ order.order_number }}</p>
+    <p>Order Date: {{ order.created_at }}</p>
+    <p>Customer Name: {{ order.user.username }}</p>
+    <!-- Add more details about the order as needed -->
+
+    <h2>Ordered Products</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order_product in order.orderproduct_set.all %}
+            <tr>
+                <td>{{ order_product.product.name }}</td>
+                <td>{{ order_product.quantity }}</td>
+                <td>{{ order_product.product_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Add any additional sections or information about the order -->
+
+</body>
+</html>

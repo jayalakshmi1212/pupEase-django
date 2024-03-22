@@ -1,0 +1,281 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+{{user}}'s cart
+{% endblock %}
+
+{% block content %}
+<body>
+    
+
+    <!--=========Main start==========-->
+    <main class="main">  
+    <!--===================--> 
+
+        <!--================== checkout =====================-->
+        
+            <div class="page-header breadcrumb-wrap">
+                <div class="container">
+                    <div class="breadcrumb">
+                        <a href="index.html" rel="nofollow">Home</a>
+                        <span></span> Shop
+                        <span></span> Shipping Address
+                        <span></span> Checkout
+                    </div>
+                </div>
+            </div>
+            <section class="mt-50 mb-50">
+                <div class="container">
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-md-5">
+                            <!-- Address form -->
+                            {% csrf_token %}
+                            {% if addresses %}
+                            <div class="mt-5">
+                                <h3 class="fs-5 mt-5 mb-4 border-bottom pb-4">Select Shipping Address <span><a href="{% url 'order:create_address' %}" id="createAddressLink"><u> Or Create New</u></a></span></h3>
+
+                                <!-- Checkout Panel Information-->
+                                <form method="post" action="{% url 'order:payment' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="selected_address_id" value="{{ selected_address.id }}">
+                                    <div class="row">
+                                        <!-- saved addresses-->
+                                        {% for add in addresses %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                        <div class="form-check form-group form-check-custom form-radio-custom form-radio-highlight mb-3">
+                                            <span class="d-flex justify-content-between align-items-start">
+                                                <span class="col-7">
+                                                    <h5 class="mb-0 fw-bolder d-block text-secondary">{{ add.name }}</h5>
+                                                    <span class="small fw-bolder text-uppercase">{{ add.phone }}</span><br>
+                                                    <span class="small fw-bolder text-uppercase">{{ add.address_line_1 }},  {{ add.address_line_2 }}</span><br>
+                                                    <span class="small fw-bolder text-uppercase">{{ add.city }}  {{ add.state }}</span><br>
+                                                    <span class="fw-bolder">pin: {{ add.pincode }}</span> 
+                                                    <input type="hidden" name="selected_address_id" value="{{ add.id }}">
+                                                </span>
+                                                <span class="col-4"> {# Set width to 30% #}
+                                                    <style>
+                                                        .custom-radio {
+                                                            border: 1px solid black;
+                                                            background-color: transparent;
+                                                            color: black;
+                                                            width: 30px;
+                                                            height: 30px;
+                                                            border-radius: 50%;
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: center;
+                                                            cursor: pointer;
+                                                            transition: background-color 0.3s, color 0.3s;
+                                                        }
+                                                        .custom-radio:hover {
+                                                            background-color: black;
+                                                            color: #ffff;
+                                                        }
+                                                        .custom-radio input[type="radio"] {
+                                                            display: none;
+                                                        }
+                                                        .custom-radio input[type="radio"]:checked + .checkmark {
+                                                            background-color: green; /* Change to green when selected */
+                                                        }
+                                                        .checkmark {
+                                                            display: inline-block;
+                                                            width: 15px;
+                                                            height: 15px;
+                                                            border-radius: 50%;
+                                                            background-color: transparent;
+                                                        }
+                                                    </style>
+                                                    <label class="custom-radio">
+                                                        <input type="radio" name="selected_address" value="{{ add.id }}">
+                                                        <span class="checkmark"></span>
+                                                    </label>
+                                                </span>
+                                            </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                        {% endfor %} 
+                                    </div>
+                             
+                            </div>
+                            {% endif %}
+                            <!-- End of address form -->
+                        </div>
+                        <!-- Address form -->
+
+                        <!-- Product details -->
+                        <div class="col-md-6 create-address-column">
+                            <h3 class="fs-5 mt-5  mb-4 border-bottom pb-4">Product Details</h3>
+                            <div class="row">
+                                <!-- Add product details here -->
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Image</th>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Price</th>
+                                                    <th scope="col">Quantity</th>
+                                                    <th scope="col">Subtotal</th>
+                                                    <th scope="col">Remove</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for cart_item in cart_items %}
+                                                <tr>
+                                                    <td class="image product-thumbnail"><img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}"></td>
+                                                    <td class="product-des product-name">
+                                                        <h5 class="product-name"><a href="#">{{ cart_item.product.name }}</a></h5>
+                                                    </td>
+                                                    <td class="price" data-title="Price"><span>{{ cart_item.product.price }}</span></td>
+                                                    <td class="text-center" data-title="Quantity">
+                                                        <div class="detail-qty border radius m-auto">
+                                                            <!-- Display quantity and provide options to update quantity -->
+                                                            <a href="{% url 'cart:add_cart' cart_item.product.id %}" class="qty-up"></i></a>
+                                                            <span class="qty-val">{{ cart_item.quantity }}</span>
+                                                            <a href="{% url 'cart:remove_cart' cart_item.product.id %}" class="qty-down"></i></a>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-right" data-title="Subtotal"><span>{{ cart_item.sub_total }}</span></td>
+                                                    <td class="action" data-title="Remove">
+                                                        <!-- Link to remove the product from the cart -->
+                                                        <a href="{%url 'cart:remove_cart_item' cart_item.product.id%}" class="text-muted"><i class="fi-rs-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                
+                                            </tbody>
+                                            
+                                        </table>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border p-md-4 p-30 border-radius cart-totals">
+                                <div class="heading_s1 mb-3">
+                                    <h4>Review Orders</h4>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table shopping-summery text-center clean">
+                                        <thead>
+                                           
+                                        </thead>
+                                        <tbody>
+                                           
+                                            <!--Cart-Subtotal, Tax, Total-->
+                                            
+                                                <tr>
+                                                    <td class="cart_total_label">Cart Subtotal</td>
+                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">{{total}}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Tax</td>
+                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">{{tax}}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">{{grand_total}}</span></strong></td>
+                                                </tr>
+                                            
+                                            <!--Cart-Subtotal, Tax, Total-->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="payment_method">
+                                <div class="mb-25">
+                                    <h5>Payment</h5>
+                                </div>
+                                <div class="payment_option">
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="">
+                                        <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#cashOnDelivery" aria-controls="cashOnDelivery">Cash on Delivery</label>
+                                        <div class="form-group collapse in" id="cashOnDelivery">
+                                            <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                               
+                                <button id="placeOrderBtn" type="submit" name="submit" class="btn btn-block" disabled>Place Order</button>
+                            </div>
+                            <!-- End of product details -->
+                        </div>
+                        <!-- Product details -->
+                    </div>
+                </div>
+            </form>
+            </section>
+            <!--================== checkout =====================-->
+        </main>
+        <!-- JavaScript to enable/disable the button -->
+<script>
+    // Function to check if an address is selected
+    function checkAddressSelected() {
+        // Get the selected address radio buttons
+        var selectedAddressRadioButtons = document.querySelectorAll('input[name="selected_address"]');
+        // Loop through each radio button
+        for (var i = 0; i < selectedAddressRadioButtons.length; i++) {
+            // If any radio button is checked, enable the Place Order button and return
+            if (selectedAddressRadioButtons[i].checked) {
+                document.getElementById('placeOrderBtn').disabled = false;
+                return;
+            }
+        }
+        // If no address is selected, disable the Place Order button
+        document.getElementById('placeOrderBtn').disabled = true;
+    }
+
+    // Call the function initially
+    checkAddressSelected();
+
+    // Attach an event listener to the address radio buttons to call the function when they change
+    var addressRadioButtons = document.querySelectorAll('input[name="selected_address"]');
+    addressRadioButtons.forEach(function(radioButton) {
+        radioButton.addEventListener('change', checkAddressSelected);
+    });
+</script>
+        <!--===================--> 
+
+        <!--========= Preloader Start ==========-->
+        
+        <!--========= Preloader end ==========-->
+
+        <!--========= Vendor JS==========-->
+        <script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+        <script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+        <script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+        <script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/counterup.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+        <!--===================-->
+
+  
+
+
+     {% endblock content %}

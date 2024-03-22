@@ -1,0 +1,98 @@
+{% extends 'partials/adminbase.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #386d38; /* Green background color */
+            color: white; /* White text color */
+        }
+        img {
+            max-width: 100px;
+        }
+        button {
+            background-color: #e4e9e5; /* Green background */
+            border: none;
+            color: white; /* White text */
+            padding: 10px 20px; /* Padding */
+            text-align: center; /* Center text */
+            text-decoration: none; /* Remove underline */
+            display: inline-block; /* Display inline */
+            border-radius: 4px; /* Rounded corners */
+            transition-duration: 0.4s; /* Transition duration */
+            cursor: pointer; /* Cursor pointer */
+        }
+        button:hover {
+            background-color: #45a049; /* Darker green */
+        }
+        button a {
+            color: red; /* Red text color */
+            text-decoration: none; /* Remove underline */
+        }
+    </style>
+</head>
+<body>
+    <h1>Product List</h1>
+    <div>
+        <a href="?sort_by=price_low_to_high">Sort by Price: Low to High</a>
+        <a href="?sort_by=price_high_to_low">Sort by Price: High to Low</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Description</th>
+                <th>Disc. Price</th>
+                <th>Stock</th>
+                <th>Active</th>
+                <th>Created Date</th>
+                <th>Actions</th> <!-- New column for buttons -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}"style="max-width: 45px; max-height: 45px;" class="rounded-circle">
+                    {% else %}
+                        No Image Available
+                    {% endif %}
+                </td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.discounted_price }}</td>
+                <td>{{ product.stock }}</td>
+                <td>{{ product.is_active }}</td>
+                <td>{{ product.created_date }}</td>
+                <td>
+                    <button><a href="{% url 'store:product_update' pk=product.pk %}">Update</a></button>|
+                    <button><a href="{% url 'store:product_delete' pk=product.pk %}">Delete</a></button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+{% endblock content %}

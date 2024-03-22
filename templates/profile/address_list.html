@@ -1,0 +1,11 @@
+<!-- profile/address_list.html -->
+<div>
+    <h1>Address List</h1>
+    <ul>
+        {% for address in addresses %}
+            <li>{{ address.street }}, {{ address.city }}, {{ address.state }} - {{ address.postal_code }}</li>
+        {% empty %}
+            <li>No addresses found.</li>
+        {% endfor %}
+    </ul>
+</div>

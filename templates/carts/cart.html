@@ -1,0 +1,120 @@
+{% extends 'partials/base.html'%}
+{% load static %}
+{% block content %}
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Your Cart
+            </div>
+        </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            {% if not cart_items %}
+                <h2 class="text-danger">Your Cart is Empty</h2>
+                <br>
+                <div class="text-center">
+                    <a href="{% url 'store:index'%}" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center clean">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Subtotal</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cart_item in cart_items %}
+                                        {% if cart_item.quantity > cart_item.product.stock %}
+                                            <tr>
+                                                <td colspan="6" class="text-center">You have reached the maximum stock left for "{{ cart_item.product.name }}".</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td class="image product-thumbnail"><img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}"></td>
+                                                <td class="product-des product-name">
+                                                    <h5 class="product-name"><a href="#">{{ cart_item.product.name }}</a></h5>
+                                                </td>
+                                                <td class="price" data-title="Price"><span>{{ cart_item.product.price }}</span></td>
+                                                <td class="text-center" data-title="Quantity">
+                                                    <div class="detail-qty border radius m-auto">
+                                                        <!-- Display quantity and provide options to update quantity -->
+                                                        <a href="{% url 'cart:add_cart' cart_item.product.id %}" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                                                        <span class="qty-val">{{ cart_item.quantity }}</span>
+                                                        <a href="{% url 'cart:remove_cart' cart_item.product.id %}" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                                                    </div>
+                                                </td>
+                                                <td class="text-right" data-title="Subtotal"><span>{{ cart_item.sub_total }}</span></td>
+                                                <td class="action" data-title="Remove">
+                                                    <!-- Link to remove the product from the cart -->
+                                                    <a href="{%url 'cart:remove_cart_item' cart_item.product.id%}" class="text-muted"><i class="fi-rs-trash"></i></a>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <tr>
+                                        <td colspan="6" class="text-end">
+                                            <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="cart-action text-end">
+                            <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
+                            <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                        </div>
+                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                        <div class="row mb-50">
+                            <div class="col-lg-6 col-md-12">
+                                <!-- Calculate Shipping and Apply Coupon sections remain unchanged -->
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cart_total_label">Cart Subtotal</td>
+                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">{{total}}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Tax</td>
+                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">{{tax}}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">{{grand_total}}</span></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="{% url 'cart:checkout' %}" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock content %}

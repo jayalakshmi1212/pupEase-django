@@ -1,0 +1,209 @@
+
+
+
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+{{user}}'s cart
+{% endblock %}
+
+{% block content %}
+<body>
+
+
+    <!--=========Main start==========-->
+    <main class="main">  
+    <!--===================--> 
+
+        <!--================== checkout =====================-->
+        
+            <div class="page-header breadcrumb-wrap">
+                <div class="container">
+                    <div class="breadcrumb">
+                        <a href="index.html" rel="nofollow">Home</a>
+                        <span></span> Shop
+                        <span></span> Order Success
+                    </div>
+                </div>
+            </div>
+            <section class="mt-50 mb-50 ">
+                <div class="container">
+                    <div class="row">
+                        <h3 class="text-center mb-50 "  style="color: #088178;">Order placed, thank you!</h3>
+                                <div class="row  d-flex justify-content-between">
+                                    
+                                    <div class="col-5">
+                                        <!--Billing Address-->
+                                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Address</h4>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table shopping-summery clean">
+                                                    <thead>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!--products in cart-->
+                                                        
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                <p class="">{{ order.address.name }}</p>
+                                                                <p class="">{{ order.address.address_line_1}}</p>
+                                                                {% if order.address.address_line_2 %}
+                                                                <p class="">{{ order.address.address_line_2}}</p>
+                                                                {% endif %}
+                                                                <p class="">Phone Number: 91+ {{ order.address.phone_number }}</p>
+                                                                <p class="">Pin Code: {{ order.address.pincode}}</p>
+                                                                <p class="">{{ order.address.city }} {{ order.address.state }} India</p>
+                                                                {% if order.order_note %}
+                                                                <strong>Order Note:</strong> {{ order.order_note }}
+                                                                {% endif %}
+                                                            </td>
+                                                            
+                                                        </tr>
+                                                        
+                                                    <!--products in cart-->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!--Billing Address-->
+
+                                        <!-- Payment Method -->
+                                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Payment Method</h4>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table shopping-summery clean">
+                                                    <thead>
+                                                        
+                                                    </thead>
+                                                    <tbody>
+                                                        <!--products in cart-->
+                                                        
+                                                        <tr>
+                                                            <td class="">{{payment_method}}</td>
+                                                        </tr>
+                                                    <!--products in cart-->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- Payment Method -->
+
+                                        
+                                    </div>
+                                    <!--cart total-->
+                                    <div class="col-7">
+                                        <!-- Review Orders -->
+                                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Review Orders</h4>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table shopping-summery text-center clean">
+                                                    <thead>
+                                                        <tr class="main-heading">  
+                                                        <th colspan="2">Product</th>
+                                                        <th>Quantity</th>
+                                                        <th>Price</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for cart_item in cart_items %}
+                                                        <tr>
+                                                            <td class="image product-thumbnail"><img src="{{cart_item.product.thumbnail_image.url}}" alt="#"></td>
+                                                            <td class="product-des product-name">
+                                                                <h5 class="product-name"><a href="{{cart_item.product.get_url}}">{{cart_item.product.product}}{% if cart_item.product.translator %}({{cart_item.product.language}}){% endif %}</a></h5>
+                                                                <p class="font-xs">by {{cart_item.product.product.author.author_name}}<br> {% if cart_item.product.translator %}{{cart_item.product.translator}}(translator){% endif %}
+                                                                </p>
+                                                            </td>
+                                                            <td class="quantity" data-title="Quantity"><span>{{cart_item.quantity}}</span></td>
+                                                            <td class="price" data-title="Price"><span>Rs.{{cart_item.product.sale_price}} </span></td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                        <!--Cart-Subtotal, Tax, Total-->
+                                                        <tr>
+                                                            <td class="cart_total_label ">Cart Subtotal</td>
+                                                            <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">Rs.{{total}}</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="cart_total_label">Tax</td>
+                                                            <td class="cart_total_amount"> <i class="ti-gift mr-5"></i>{{tax}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="cart_total_label">Total</td>
+                                                            <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">Rs.{{grand_total}}</span></strong></td>
+                                                        </tr>
+                                                        <!--Cart-Subtotal, Tax, Total-->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- Review Orders -->
+                                    </div>
+                                    
+                        <!--cart total-->
+                                </div> 
+                    </div>
+                </div>
+            </section>
+            
+        <!--================== checkout =====================-->
+                    
+
+    <!--========= Main end ==========-->
+    </main>
+    <!--===================--> 
+
+
+<!--========= Preloader Start ==========-->
+{% comment %}     <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-10">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+<!--========= Preloader end ==========-->
+
+<!--========= Vendor JS==========-->
+<script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+<script src="{% static 'assets/js/plugins/counterup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+<script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+<script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+<!--===================-->
+
+<!--========= Template  JS ==========-->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+<!--===================-->
+   
+</body>
+
+{% endblock content %}

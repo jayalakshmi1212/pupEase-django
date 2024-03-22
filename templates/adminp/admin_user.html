@@ -1,0 +1,161 @@
+{% extends 'partials/adminbase.html'%}
+{% load static %}
+{%  block content %}
+<head>
+    <!-- Your head content here -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+</head>
+    <title>Admin User Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fff;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .block {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .unblock {
+            background-color: #28a745;
+            color: #fff;
+        }
+    </style>
+
+
+
+        
+                   
+
+<body>
+    <h1>Admin User Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in userdata %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <form action="{% url 'adminp:toggle_user_status' user.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <button type="submit" class="{% if user.is_active %}block{% else %}unblock{% endif %}">
+                            {% if user.is_active %}
+                                Block
+                            {% else %}
+                                Unblock
+                            {% endif %}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script>
+        // Function to display SweetAlert confirmation when blocking a user
+        function confirmBlockUser(userId) {
+            swal({
+                title: "Are you sure?",
+                text: "Once blocked, the user will be unable to access their account!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willBlock) => {
+                if (willBlock) {
+                    // Proceed with blocking the user
+                    window.location.href = "{% url 'adminp:toggle_user_status' user.id %}?user_id=" + userId;
+                }
+            });
+        }
+
+        // Attach confirmBlockUser function to block button click event
+        document.querySelectorAll('.block').forEach(item => {
+            item.addEventListener('click', () => {
+                confirmBlockUser(item.getAttribute('data-user-id'));
+            });
+        });
+    </script>
+</body>
+</html>
+                    
+                                    
+                <!-- card-body end// -->
+            </div>
+            <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+      
+    </main>
+    <script src="{% static 'admin/js/vendors/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/select2.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/jquery.fullscreen.min.js' %}"></script>
+    <!-- Main Script -->
+    <script src="{% static 'admin/js/main.js' %}" type="text/javascript"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-reviews.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:34 GMT -->
+</html>
+{% endblock content %}

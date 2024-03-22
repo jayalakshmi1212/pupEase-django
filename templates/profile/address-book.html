@@ -1,0 +1,161 @@
+
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+Username's profile
+{% endblock %}
+
+{% block content %}
+<style>
+    .modal-custom{
+        position: fixed;
+        top: 120px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+   </style>
+
+<body>
+ 
+<!--=========Main start==========-->
+<main class="main">  
+<!--===================--> 
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    <section class="pt-70 pb-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% include "profile/profile-menu.html" %}
+                        </div>
+                        <div class="col-md-8">
+                    <!--============= AdressBook ============-->
+                   
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>AddressBook</h5>
+                            </div>
+                            <div class="card-body">
+                            {% if addresses %}
+                            <!--============= Listing Address ============-->
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 ml-4">Addresses</h6>
+                                <a class="dash__custom-link btn" href="{% url 'store:add_address' %}">Add Address</a>
+                            </div>
+                            
+                            <div class="row">
+                                {% for address in addresses %}
+                                    <div class="card m-2 d-flex flex-column">
+                                        <div class="card-body" {% if address.is_default %} style="background: #dedddd;" {% endif %}>
+                                            <div class="row justify-content-between">
+                                                <div class="col-7">
+                                                    <h6 class="card-subtitle mb-2 text-muted">Address {{ forloop.counter }}</h6>
+                                                    <p class="card-text text-wrap">
+                                                        {{ address.get_user_full_address }}
+                                                    </p>
+                                                </div>
+                                                <div class="col-4  d-flex align-items-center overflow-hidden justify-content-between my-1 py-1">
+                                                    <a class="" href="{% url 'store:edit_address' address.id %}">
+                                                        <img width="" src="{% static 'assets\imgs\icons\pencil-square.svg' %}" alt="edit">
+                                                    </a>
+                                                    <a href="{% url 'store:delete_address' address.id %}" class="mx-0">
+                                                        <img width=""  src="{% static 'assets\imgs\icons\trash3.svg' %}" alt="delete">
+                                                    </a>
+                                                    {% if address.is_default %}
+                                                        <img width="" class='mb-1' src="{% static 'assets\imgs\icons\record-circle.svg' %}" alt="Default">
+                                                    {% else %}
+                                                        <a href="{% url 'store:default_address' address.id %}" class="">
+                                                            <img width="" src="{% static 'assets\imgs\icons\circle.svg' %}" alt="Default">
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                                               
+                            <!--============= Listing Address ============-->
+                            {% else %}
+                               <div>
+                                there is no address added...
+                                </div>
+                               <div>
+                                <a href="{% url 'store:add_address' %}" class=" mt-4 btn ont-sm hover-up">Add Address</a>
+                                </div>
+                            {% endif %}
+                            </div>
+                        </div>
+                 
+                    <!--============= Adress Book ============-->
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
+
+
+<!--=========Main end==========-->
+</main>
+<!--===================--> 
+
+<!--========= Preloader Start ==========-->
+{% comment %}     <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-10">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+<!--========= Preloader end ==========-->
+
+<!--========= Vendor JS==========-->
+<script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+<script src="{% static 'assets/js/plugins/counterup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+<script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+<script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+<!--===================-->
+
+<!--========= Template  JS ==========-->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+<!--===================-->
+   
+</body>
+
+            </div>
+{% endblock content %}

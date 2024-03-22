@@ -1,0 +1,201 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+    Username's Order Details
+{% endblock %}
+
+{% block content %}
+
+
+<section class="content-main">
+    <div class="text-end me-4">
+       <button><a href="{% url 'order:generate_pdf' order_number=order.order_number %}">Download Invoice</a></button>
+    </div>
+
+    <div class="card" id="products">
+        <header class="card-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 col-md-4 mb-lg-0 mb-15">
+                        <span>
+                            <i class="material-icons md-calendar_today"></i> Order DATE:
+                            <b>{{ order.created_at }}</b>
+                        </span> <br>
+                        <small class="text-muted">Order ID: {{ order.order_number}}</small>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="text">
+                            <h6 class="mb-1">Customer</h6>
+                            <small class="text-muted">CUSTOMER NAME: {{ order.user.username }}</small><br>
+                            <small class="text-muted">CUSTOMER MOBILE: {{ order.user.phone_number }}</small><br>
+                            <a href="#">View profile</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="text-center">
+                            <h6 class="mb-1">Deliver to</h6>
+                            <p class="mb-1">
+                                  {% if selected_address %}
+                                <p>{{ selected_address.name }}</p>
+                                <p>{{ selected_address.address_line_1 }}</p>
+                                {% if selected_address.address_line_2 %}
+                                    <p>{{ selected_address.address_line_2 }}</p>
+                                {% endif %}
+                                <p>{{ selected_address.city }}, {{ selected_address.state }}, {{ selected_address.pincode }}</p>
+                            {% else %}
+                                <p>No address selected</p>
+                            {% endif %}
+                            </p>
+                            <a href="#">View profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="card-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product Image</th>
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>Total Price</th>
+                                        <th>Status</th>
+                                        <th>Payment</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order_product in order.orderproduct_set.all %}
+                                        <tr>
+                                            <td>
+                                               
+                                                {% if order_product.product.image %}
+                                               
+                                                    <img src="{{ order_product.product.image.url }}" alt="Product Image" class="rounded-circle product-image">
+                                                
+                                            {% else %}
+                                               
+                                                    <div class="no-image">No Image Available</div>
+                                                </div>
+                                            {% endif %}
+                                            </td>
+                                            <td>{{ order_product.product.name }}</td>
+                                            <td>{{ order_product.quantity }}</td>
+                                            <td>{{ order_product.product_price }}</td>
+                                            <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};">{{ order.status }}</td>
+
+                                            <td>Cash on Delivery</td>
+                                            <td><a href="#" id="cancelOrderBtn">Cancel</a></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+<!-- Confirmation Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelOrderModalLabel">Confirm Order Cancellation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this order?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="confirmCancelBtn">Cancel Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to handle cancel/return button behavior
+    function handleCancelReturnButton(orderStatus) {
+        var cancelBtn = document.getElementById("cancelOrderBtn");
+        // Check if the order status is "cancelled" or "delivered"
+        if (orderStatus === "cancelled" || orderStatus === "delivered") {
+            // Disable the button
+            cancelBtn.disabled = true;
+            // Change button text to "Cancelled" or "Returned" accordingly
+            cancelBtn.innerText = (orderStatus === "cancelled") ? "Cancelled" : "Returned";
+        } else {
+            // Enable the button
+            cancelBtn.disabled = false;
+            // Reset button text to "Cancel"
+            cancelBtn.innerText = "Cancel";
+        }
+    }
+
+    // Call the function on page load with order status
+    handleCancelReturnButton("{{ order.status }}");
+
+    // Handle click event on cancel button/link
+    document.getElementById("cancelOrderBtn").addEventListener("click", function() {
+        // Check if the order status is not already "cancelled" or "delivered"
+        if ("{{ order.status }}" !== "cancelled" && "{{ order.status }}" !== "delivered") {
+            // Show the modal
+            $('#cancelOrderModal').modal('show');
+        }
+    });
+
+    // Handle click event on confirm cancellation button
+    document.getElementById("confirmCancelBtn").addEventListener("click", function() {
+        // Perform AJAX request to cancel the order
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'order:cancel_order' order_number=order.order_number %}",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function(response) {
+                // Reload the page to reflect the updated order status
+                window.location.reload();
+            },
+            error: function(xhr, errmsg, err) {
+                // Handle error if needed
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+        // Disable the cancel button after it has been pressed
+        document.getElementById("cancelOrderBtn").disabled = true;
+        // Change button text to "Cancelled"
+        document.getElementById("cancelOrderBtn").innerText = "Cancelled";
+    });
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    // Your JavaScript code here
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="{% static 'assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/vendors/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/vendors/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
+<!-- Main Script -->
+<script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
+</body>
+</html>
+{% endblock content %}

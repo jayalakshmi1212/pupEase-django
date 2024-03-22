@@ -1,0 +1,13 @@
+{% autoescape off %}
+
+ Hello  {{user.username}}
+
+As requested, please click below link to reset password.
+http://{{domain}}{% url 'userauths:resetpassword_validate' uidb64=uid token=token %}
+
+If it is not you, please ignore this email.
+
+Thank you,
+TEAM Cactus
+
+{% endautoescape %}

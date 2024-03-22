@@ -1,0 +1,157 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+Payment
+{% endblock %}
+
+{% block content %}
+<body>
+
+
+<!--=========Main start==========-->
+<main class="main">  
+<!--===================--> 
+
+                     <!--================== Payment =====================-->
+                 
+                        <div class="page-header breadcrumb-wrap">
+                            <div class="container">
+                                <div class="breadcrumb">
+                                    <a href="index.html" rel="nofollow">Home</a>
+                                    <span></span> Checkout
+                                    <span></span> Payment
+                                </div>
+                            </div>
+                        </div>
+                        <section class="mt-50 mb-50">
+                            <div class="container">
+                                <h3 class="text-center mb-50">Yay!! Order successfully placed</h3>
+                                <div class="row  d-flex justify-content-between">
+                                    
+                                    <div class="col-5">
+                                        <!--Cart Totals-->
+                                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Cart Totals</h4>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="cart_total_label">Cart Subtotal</td>
+                                                            <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">Rs.{{total}}</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="cart_total_label">Tax</td>
+                                                            <td class="cart_total_amount"> <i class="ti-gift mr-5"></i>{{tax}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="cart_total_label">Total</td>
+                                                            <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">Rs.{{grand_total}}</span></strong></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            
+                                            <a href="{% url 'order:user_orders' %}" class="btn text-center"><i class="fi-rs-box-alt mr-10"></i>Go to orders</a>
+
+                                        
+                                        </div>
+                                        <!--Cart Totals-->
+                                    </div>
+                                    
+                                    <div class="col-7">
+                                        <!--Billing Address-->
+                                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Shipping address</h4>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table shopping-summery clean">
+                                                    <thead>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <div>
+                                                                
+                                                                {% if selected_address %}
+                                                                    <p>{{ selected_address.name }}</p>
+                                                                    <p>{{ selected_address.address_line_1 }}</p>
+                                                                    {% if selected_address.address_line_2 %}
+                                                                        <p>{{ selected_address.address_line_2 }}</p>
+                                                                    {% endif %}
+                                                                    <p>{{ selected_address.city }}, {{ selected_address.state }}, {{ selected_address.pincode }}</p>
+                                                                {% else %}
+                                                                    <p>No address selected</p>
+                                                                {% endif %}
+                                                            </div>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!--Billing Address-->
+
+                                        <!-- Payment Method -->
+                                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Payment Method</h4>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table shopping-summery clean">
+                                                    <thead>
+                                                        
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="">{{payment_method}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- Payment Method -->
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    <!--================== Payment =====================-->
+                     
+
+
+<!--========= Main end ==========-->
+</main>
+<!--===================--> 
+
+<!--========= Vendor JS==========-->
+<script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+<script src="{% static 'assets/js/plugins/counterup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+<script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+<script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+<!--===================-->
+
+<!--========= Template  JS ==========-->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+<!--===================-->
+   
+</body>
+
+{% endblock content %}

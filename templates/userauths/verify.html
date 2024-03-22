@@ -1,0 +1,99 @@
+<!-- Your main HTML page -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="shortcut icon" href="" type="image/webp" />
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add styles for the timer */
+        #timer {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* Style the countdown span */
+        #countdown {
+            font-weight: bold;
+            color: #ff5733; /* Orange color, you can change this to any color you like */
+        }
+
+        /* Add styles for the running cat */
+        #running-cat {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 70px; /* Adjust the size as needed */
+        }
+    </style>
+</head>
+
+<body>
+    <section class="vh-100">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card shadow-2-strong">
+                        <div class="card-body p-5 text-center">
+                            <h3 class="mb-5" style="font-weight: 900">OTP Verification</h3>
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <div class="form-outline mb-4">
+                                    <label style="float: left; margin: 10px 20px 0 20px" class="fw-bold">OTP</label>
+                                    <input type="text" class="form-control form-control-lg" name="otp"
+                                        style="font-size: 14px" placeholder="{{user.username}}" />
+                                </div>
+
+                                {% if messages %} {% for message in messages %}
+                                <label style="color: red">{{ message }}</label>
+                                {% endfor %} {% endif %}
+
+                                <!-- Add the colorful timer -->
+                                <p id="timer">Time remaining: <span id="countdown">60</span> seconds</p>
+                                <br>
+                                <!-- Add the running cat image -->
+                                <img id="running-cat" src="{% static 'runningcat.gif' %}" alt="Running Cat">
+
+                                <button type="submit" class="col-md-12 btn btn-primary">Submit</button>
+                                <br>
+                                <br>
+                                <br>
+                                
+
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous">
+    </script>
+    <script>
+        // Countdown timer
+        var countdownElement = document.getElementById('countdown');
+        var timeRemaining = parseInt(countdownElement.textContent);
+
+        var countdownInterval = setInterval(function () {
+            timeRemaining -= 1;
+            countdownElement.textContent = timeRemaining;
+
+            // Adjust the cat's position based on time remaining
+            var runningCat = document.getElementById('running-cat');
+            runningCat.style.left = (100 - (timeRemaining / 60 * 100)) + '%';
+
+            if (timeRemaining <= 0) {
+                clearInterval(countdownInterval);
+                // Redirect to the timeout page
+                window.location.href = "{% url 'userauths:signuppage' %}";
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>

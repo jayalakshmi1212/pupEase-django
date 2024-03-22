@@ -1,0 +1,165 @@
+
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+Username's profile
+{% endblock %}
+
+{% block content %}
+<style>
+   
+</style>
+<body>
+
+<!--=========Main start==========-->
+<main class="main">  
+<!--===================--> 
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    <section class="pt-70 pb-100 ">
+        <div class="container ">
+            <div class="row">
+                <div class="col-lg-10 m-auto ">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% include "profile/profile-menu.html" %}
+                        </div>
+                        <div class="col-md-8">
+                    <!--============= Account deatails ============-->
+                        {% if profile.username %}
+                        <div class="dash__pad-2 ">
+                            <h1 class="dash__h1 u-s-m-b-14 ">My Profile</h1>
+
+                            <span class="dash__text u-s-m-b-30 my-3">Look all your info, you could customize your profile.</span>
+                            <div class="row my-4 mb-3 d-flex justify-content-center align-items-center">
+                               
+                        
+                                <div class="d-flex justify-content-between mt-4 mb-2">
+                                    <div class="col-lg-4 u-s-m-b-30">
+                                      <h4 class="dash__h4 u-s-m-b-8">Phone</h4>
+                                      <span class="dash__text">{{user.phone_number}}</span>
+                                      <div class="dash__link dash__link--secondary"></div>
+                                    </div>
+                                    <div class="col-lg-4 u-s-m-b-30 text-center">
+                                      <h4 class="dash__h4 u-s-m-b-8">E-mail</h4>
+                                      <span class="dash__text">{{user.email}}</span>
+                                      <div class="dash__link dash__link--secondary"></div>
+                                    </div>
+                                    <div class="col-lg-4 u-s-m-b-30 text-end">
+                                      <h4 class="dash__h4 u-s-m-b-8">user Name</h4>
+                                      <span class="dash__text">{{profile.username}} </span>
+                                    </div>
+                                  </div>
+                                  
+                                
+                              
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="dash__link dash__link--secondary u-s-m-b-30">
+
+                                        </div>
+                                        <div class="row mt-4">
+                                            <div class="col-lg-12">
+            
+                                                    <span>
+                                                        <a class="dash__custom-link btn--e-transparent-brand-b-2" href="{% url 'store:edit_profile' %}">Edit Profile</a>
+{% comment %}                                                         <span>|</span>
+                                                        <a class="dash__custom-link btn--e-brand-b-2" href="">Change Password</a> {% endcomment %}
+                                                    </span>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="dash__pad-2">
+                            <h1 class="mb-4">My Profile</h1>
+
+                            <span class="mt-4">Hey {{user.username}}! you have not completed setting up your profile, complete your profile and get flat 15% off on your next purchase  <br>
+                                happy shopping happy reading!</span>
+                        
+                            <div class="row mt-4">
+                                <div class="col-lg-12">
+
+                                        <span>
+                                            <a class="dash__custom-link btn--e-transparent-brand-b-2" href="{% url 'store:edit_profile' %}">Edit Profile</a>
+                                            <span>|</span>
+                                            <a class="dash__custom-link btn--e-brand-b-2" href="">Change Password</a>
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    <!--============= Account deatails ============-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+<!--========= Main end ==========-->
+</main>
+<!--===================--> 
+
+
+<!--========= Preloader Start ==========-->
+{% comment %}     <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-10">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+<!--========= Preloader end ==========-->
+
+<!--========= Vendor JS==========-->
+<script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+<script src="{% static 'assets/js/plugins/counterup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+<script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+<script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+<!--===================-->
+
+<!--========= Template  JS ==========-->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+<!--===================-->
+   
+</body>
+
+{% endblock content %}

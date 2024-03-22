@@ -1,0 +1,207 @@
+
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+Username's profile
+{% endblock %}
+
+{% block content %}
+<style>
+    
+    .sidebar .footer {
+        background: GREEN;
+        color: #fff;
+        position:fixed;
+        width:100%;
+        top:200px;
+        left:0;
+        padding top:20px;
+        padding left:20px;
+        height:60px;
+        z-index:100;
+    }
+</style>
+
+<body>
+ 
+
+<!--=========Main start==========-->
+<main class="main">  
+<!--===================--> 
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    <section class="pt-70 pb-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% include "profile/profile-menu.html" %}
+                        </div>
+                        <div class="col-md-8">
+                    <!--============= Add Address ============-->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Add Address</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" name="add-address-form">
+                                {% csrf_token %}
+                                <div class="row">
+                                    {% if form.errors %}
+                                    {% for error in form.errors %}{{error}}{% endfor %}
+                                    {% endif %}
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label>Full Name <span class="required">*</span></label>
+                                            {{ form.name }}
+                                            {% if form.errors.name %}
+                                                <label class="text-danger">{{ form.errors.name.0 }}</label>
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Phone Number <span class="required">*</span></label>
+                                            <div class="input-group ">
+                                                <div class="input-group-prepend ">
+                                                    <span class="input-group-text h-100">+91</span>
+                                                </div>
+                                                <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Enter your phone number">
+                                            </div>
+                                            {% if form.errors.phone_number %}
+                                                <label class="text-danger">{{ form.errors.phone_number.0 }}</label>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Address line1 <span class="required">*</span></label>
+                                        {{ form.address_line_1 }}
+                                        {% if form.errors.address_line_1 %}
+                                            <label class="text-danger">{{ form.errors.address_line_1.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Address line 2<span class="required">*</span></label>
+                                        {{ form.address_line_2 }}
+                                        {% if form.errors.address_line_2 %}
+                                            <label class="text-danger">{{ form.errors.address_line_2.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>Country<span class="required">*</span></label>
+                                        {{ form.country }}
+                                        {% if form.errors.country %}
+                                            <label class="text-danger">{{ form.errors.country.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>State<span class="required">*</span></label>
+                                        {{ form.state }}
+                                        {% if form.errors.state %}
+                                            <label class="text-danger">{{ form.errors.state.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>City<span class="required">*</span></label>
+                                        {{ form.city }}
+                                        {% if form.errors.city %}
+                                            <label class="text-danger">{{ form.errors.city.0 }}</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>PIN<span class="required">*</span></label>
+                                        {{ form.pincode }}
+                                        {% if form.errors.pincode %}
+                                            <label class="text-danger">{{ form.errors.pincode.0 }}</label>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Add other address fields here as needed -->
+                                    <!-- ... -->
+                                    <div class="col-md-12">
+                                        <div class="row mt-2">
+                                            <div class="col-lg-6">
+                                                <div class="mb-4">
+                                                    <button type="submit" class="w-100 btn btn-md rounded-pill font-sm hover-up">Add Address</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="mb-4">
+                                                    <a href="{% url 'store:address_book' %}" class="btn btn-dark rounded-pill w-100">Go Back</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!--============= Add Address ============-->
+
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
+
+
+<!--=========Main end==========-->
+</main>
+<!--===================--> 
+
+
+<!--========= Preloader Start ==========-->
+{% comment %}     <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-10">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+<!--========= Preloader end ==========-->
+
+<!--========= Vendor JS==========-->
+<script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+<script src="{% static 'assets/js/plugins/counterup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+<script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+<script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+<!--===================-->
+
+<!--========= Template  JS ==========-->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+<!--===================-->
+   
+</body>
+
+{% endblock content %}

@@ -1,0 +1,94 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+    Username's profile
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            {% include "profile/profile-menu.html" %}
+        </div>
+        <div class="col-md-8">
+            <style>
+                /* CSS Styles */
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px; /* Add margin-top to create space */
+                }
+
+                th, td {
+                    padding: 10px;
+                    border-bottom: 1px solid #ddd;
+                    text-align: left;
+                }
+
+                th {
+                    background-color: #f2f2f2;
+                }
+
+                .product-image {
+                    width: 50px;
+                    height: 50px;
+                    object-fit: cover;
+                    border-radius: 5px;
+                }
+
+                .order-actions a {
+                    text-decoration: none;
+                    color: #007bff;
+                }
+
+                .order-actions a:hover {
+                    text-decoration: underline;
+                }
+            </style>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order Number</th>
+                        <th>Product Image</th>
+                        <th>Products</th>
+                        <th>Arriving on</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in user_orders %}
+                    <tr>
+                        <td>{{ order.order_number }}</td>
+                        <td>
+                            {% if order.products_info %}
+                                <img src="{{ order.products_info.0.product_image }}" alt="Product Image" class="product-image">
+                            {% else %}
+                                No Image Available
+                            {% endif %}
+                        </td>
+                        <td>
+                            <ul>
+                                {% for product_info in order.products_info %}
+                                <li>{{ product_info.product_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td style="color: red;" >
+                            {% if order.deliverd_at %}
+                                {{ order.deliverd_at }}
+                            {% endif %}
+                        </td>
+                        <td class="order-actions">
+                            <a href="{% url 'order:order_detail' order_number=order.order_number %}">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

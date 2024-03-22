@@ -1,0 +1,128 @@
+{% extends 'partials/adminbase.html'%}
+{% load static %}
+{%  block content %}
+
+    <title>Category List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fff;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        .action-buttons button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .edit {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .delete {
+            background-color: #dc3545;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Category List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>images</th>
+                <th>Category Name</th>
+                
+                <th>Description</th>
+                <th>Slug</th>
+                <th>Is Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+                <tr>
+                    {% if category.image %}
+                    <td><img src="{{ category.image.url }}" alt="{{ category.category_name }}"style="max-width: 45px; max-height: 45px;" class="rounded-circle"></td>
+                {% else %}
+                    <td>No image</td>
+                {% endif %}
+                   <td> {{ category.category_name }}</td>
+                   
+                    <td>{{ category.description }}</td>
+                    <td>{{ category.slug }}</td>
+                    <td>{{ category.is_active }}</td>
+                    <td class="action-buttons">
+                        <button><a href="{% url 'store:edit_category' category.pk %}">Edit</a></button>
+                        <button><a href="{% url 'store:delete_category' category.pk %}">Delete</a></button>
+                    </td>
+                    
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+
+                <!-- card-body end// -->
+            </div>
+            <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                        <li class="page-item"><a class="page-link" href="#">02</a></li>
+                        <li class="page-item"><a class="page-link" href="#">03</a></li>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        <li class="page-item"><a class="page-link" href="#">16</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+      
+    </main>
+    <script src="{% static 'admin/js/vendors/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/select2.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'admin/js/vendors/jquery.fullscreen.min.js' %}"></script>
+    <!-- Main Script -->
+    <script src="{% static 'admin/js/main.js' %}" type="text/javascript"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-reviews.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:34 GMT -->
+</html>
+{% endblock content %}

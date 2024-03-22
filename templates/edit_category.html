@@ -1,0 +1,82 @@
+{% extends 'partials/adminbase.html'%}
+{% load static %}
+{%  block content %}
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Add New Product</h2>
+                <div>
+                    <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                    <button class="btn btn-md rounded font-sm hover-up">Publish</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Basic</h4>
+                </div>
+                <div class="card-body">
+                    <body>
+                        <h1 class="super">Edit Category</h1>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </body>
+                </div>
+            </div> <!-- card end// -->
+            <div class="card mb-4">
+                
+            </div> <!-- card end// -->
+        </div>
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Media</h4>
+                </div>
+                <div class="card-body">
+                    <div class="input-upload">
+                        <label for="file-upload" class="btn btn-secondary">
+                            <img src="{% static 'assets/imgs/theme/upload.svg' %}" alt="Upload Image">
+                            Upload Image
+                        </label>
+                        <input id="file-upload" class="form-control" type="file" name="image" style="display: block;">
+                    </div>
+                </div>
+                
+            </div> <!-- card end// -->
+        </div>
+    </div>
+</section> <!-- content-main end// -->
+<style>
+    .super {
+        font-size: 2em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .is-active-button {
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    
+    .is-inactive-button {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+</style>
+{% endblock content %}
