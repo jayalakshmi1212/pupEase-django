@@ -21,7 +21,7 @@ from django.http import JsonResponse
 from django.utils.crypto import get_random_string
 from django.template.loader import get_template
 from django.views.generic import View
-
+from django.views.decorators.csrf import csrf_exempt
 
 
 def place_order(request):
@@ -101,17 +101,18 @@ def payment(request):
     grand_total = total + tax
 
     selected_address_id = request.POST.get('selected_address')
+   
     selected_address = None
     if selected_address_id:
         try:
             selected_address = Addresses.objects.get(id=selected_address_id)
         except Addresses.DoesNotExist:
             pass
-
+    payment_method = request.POST.get('payment_option')
     payment = Payment.objects.create(
         user=current_user,
         payment_id=f'COD-{current_user.pk:05d}-{timezone.now().strftime("%Y%m%d%H%M%S")}',
-        payment_method='Cash on Delivery',
+        payment_method=payment_method,
         amount_paid=grand_total,
         status='Processed',
     )
@@ -141,91 +142,33 @@ def payment(request):
     delivery_date = timezone.now() + timedelta(days=5)
     order.deliverd_at = delivery_date
     order.save()
-
     context = {
         'order': order,
         'cart_items': cart_items,
         'total': total,
         'tax': tax,
         'grand_total': grand_total,
-        'payment_method': 'Cash on Delivery',
         'selected_address': selected_address
     }
+    
 
     cart_items.delete()
     return render(request, 'carts/payment.html', context)
 
-
-
-def order_success(request):
-    current_user = request.user
-    cart_items = Cartitem.objects.filter(user=current_user)
-    total = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
-    tax = (2 * total) / 100
-    grand_total = total + tax
-
-    orders = Order.objects.filter(user=current_user, is_ordered=True)
-
-    if orders.count() == 1:
-        order = orders.first()
+@csrf_exempt  # Only use this decorator if CSRF protection is disabled for this view intentionally
+def update_payment_method(request):
+    if request.method == 'POST' and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        # Get the selected payment method from the request data
+        selected_payment_method = request.POST.get('payment_method')
+        
+        # Perform any necessary processing (e.g., save to database)
+        
+        # Return a JSON response
+        return JsonResponse({'status': 'success', 'payment_method': selected_payment_method})
     else:
-        return redirect('cart:order_success')
-
-    context = {
-        'order': order,
-        'cart_items': cart_items,
-        'total': total,
-        'tax': tax,
-        'grand_total': grand_total,
-        'payment_method': 'Cash on Delivery'
-    }
-
-    cart_items.delete()
-    return render(request, 'carts/order-success.html', context)
-
-
-def create_address(request):
-    if request.method == 'POST':
-        form = AddressForm(data=request.POST, user=request.user)
-        if form.is_valid():
-            address = form.save(commit=False)
-            address.user = request.user
-            address.is_active = True
-            address.save()
-            messages.success(request, "Address successfully added!")
-            return redirect('cart:checkout')
-    else:
-        form = AddressForm(user=request.user)
-
-    return render(request, 'carts/checkout.html', {'form': form})
-def order_success(request):
-    current_user = request.user
-    cart_items = Cartitem.objects.filter(user=current_user)
-    total = 0
-    for cart_item in cart_items:
-        total += (cart_item.product.price * cart_item.quantity)
+        # Return a JSON error response if the request is not valid
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'})
     
-    tax = (2 * total) / 100
-    grand_total = total + tax
-
-    orders = Order.objects.filter(user=current_user, is_ordered=True)
-
-    if orders.count() == 1:
-        order = orders.first()
-    else:
-        return redirect('store:index')
-
-    context = {
-        'order': order,
-        'cart_items': cart_items,
-        'total': total,
-        'tax': tax,
-        'grand_total': grand_total,
-        'payment_method': 'Cash on Delivery'
-    }
-
-    cart_items.delete()
-    return render(request, 'carts/order-success.html', context)
 
 def create_address(request):
     if request.method == 'POST':

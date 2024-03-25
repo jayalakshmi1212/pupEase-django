@@ -199,14 +199,24 @@
                                 </div>
                                 <div class="payment_option">
                                     <div class="custome-radio">
-                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="">
+                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="" value="COD">
                                         <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#cashOnDelivery" aria-controls="cashOnDelivery">Cash on Delivery</label>
                                         <div class="form-group collapse in" id="cashOnDelivery">
                                             <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
                                         </div>
                                     </div>
-                                   
+
                                 </div>
+                                <div class="custome-radio">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="razorpayOption" value="Razor-Pay">
+                                    <label class="form-check-label" for="razorpayOption" data-bs-toggle="collapse" data-target="#razorpay" aria-controls="razorpay"><strong class="text-dark">Razorpay Online Payment</strong></label>
+                                    <div class="form-group collapse" id="razorpay">
+                                        <!-- Razorpay payment form goes here -->
+                                        <!-- Example: -->
+                                    
+                                    </div>
+                                </div>
+                            </div>
                                
                                 <button id="placeOrderBtn" type="submit" name="submit" class="btn btn-block" disabled>Place Order</button>
                             </div>
@@ -220,6 +230,8 @@
             <!--================== checkout =====================-->
         </main>
         <!-- JavaScript to enable/disable the button -->
+        
+
 <script>
     // Function to check if an address is selected
     function checkAddressSelected() {

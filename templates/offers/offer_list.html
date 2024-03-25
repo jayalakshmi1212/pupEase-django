@@ -1,0 +1,107 @@
+{% extends 'partials/adminbase.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="content-title card-title">Offer List</h2>
+
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <form action="" method="get">
+                    <div class="d-flex align-items-center">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search for products...">
+                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3" style="display: flex;">
+                            <label for="status" class="form-control">Select Status:</label>
+                            <select name="discountOn" class="form-select" id="status">
+                                <option value="" selected>All</option>
+                                <option value="product">Product Offer</option>
+                                <option value="category">Category Offer</option>
+                            </select>
+                        </div>
+                        <input type="submit" class="btn btn-sm font-sm rounded btn-brand" value="Filter">
+                    </div>
+                </form>
+            </div>
+        </header>
+        <div class="card-body">
+            <table id="products" class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Offer Name</th>
+                        <th scope="col">Offer On</th>
+                        <th scope="col">Discount</th>
+                        <th scope="col">Offer Starts at</th>
+                        <th scope="col">Offer ends at</th>
+                        <th scope="col">Offered Product/Category</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in offers %}
+                    <tr>
+                        <td>{{ offer.name }}</td>
+                        <td>{{ offer.offer_on }}</td>
+                        <td>
+                            {% if offer.discount == 'fixed Amount' %}
+                            ₹{{ offer.discount }}
+                            {% else %}
+                            {{ offer.discount }}%
+                            {% endif %}
+                        </td>
+                        
+                        <td>{{ offer.starts_at | date:'SHORT_DATE_FORMAT' }}</td>
+                        <td>{{ offer.ends_at | date:'SHORT_DATE_FORMAT' }}</td>
+                        <td style="width: 250px;">
+                            {% if offer.offer_on == 'product' %}
+                            {% if offer.product %}
+                                {{ offer.product.name }}
+                            {% else %}
+                                No product associated
+                            {% endif %}
+                        {% else %}
+                            {% if offer.category %}
+                                {{ offer.category.category_name }}
+                            {% else %}
+                                No category associated
+                            {% endif %}
+                        {% endif %}          
+                     </td>
+                     <td>
+                        {% if offer.status == 'active' %}
+                        <span class="badge rounded-pill alert-success">Active</span>
+                        {% else %}
+                        <span class="badge rounded-pill alert-danger">Blocked</span>
+                        {% endif %}
+                    </td>
+                    
+                        <td>
+                            {% if offer.status == 'active' %}
+                                <a href="{% url 'adminp:block_offer' offer.id %}" class="btn btn-sm font-sm rounded btn-danger">Unlist</a>
+                            {% else %}
+                                <a href="{% url 'adminp:block_offer' offer.id %}" class="btn btn-sm font-sm rounded btn-brand">List</a>
+                            {% endif %}
+                            <a class="btn btn-sm font-sm rounded btn-light" href="{% url 'adminp:offer_edit' offer.id %}">Edit</a>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#products').DataTable({
+            "paging": false,
+        });
+    });
+</script>
+{% endblock %}

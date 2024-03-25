@@ -7,6 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from order.models import Order,OrderProduct
+from store.models import Offer, OfferProductAssociation,Category,Product
+from .forms import OfferForm
+
 
 
 
@@ -112,3 +115,43 @@ def admin_order_detail(request, order_number):
         'order_products': order_products,  # Passing order products to the template
     }
     return render(request, 'adminp/admin_order_detail.html', context)
+
+
+
+
+
+
+#--------------------------------------------------------offer management------------------------------------------------#
+
+def offer_list(request):
+    offers = Offer.objects.all()
+    return render(request, 'offers/offer_list.html', {'offers': offers})
+
+def offer_edit(request, offer_id):
+    offer = get_object_or_404(Offer, pk=offer_id)
+    if request.method == 'POST':
+        form = OfferForm(request.POST, instance=offer)
+        if form.is_valid():
+            form.save()
+            return redirect('adminp:offer_list')
+    else:
+        form = OfferForm(instance=offer)
+    return render(request, 'offers/offer_edit.html', {'form': form})
+
+def block_offer(request, offer_id):
+    offer = get_object_or_404(Offer, pk=offer_id)
+    offer.status = 'inactive' if offer.status == 'active' else 'active'
+    offer.save()
+    return redirect('adminp:offer_list')
+
+def create_offer(request):
+    categories = Category.objects.all()
+    products = Product.objects.all()
+    if request.method == 'POST':
+        form = OfferForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('adminp:offer_list')  # Redirect to the offer list page after successful creation
+    else:
+        form = OfferForm()
+    return render(request, 'offers/create_offer.html', {'form': form, 'categories': categories, 'products': products})

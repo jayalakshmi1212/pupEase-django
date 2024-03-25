@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Offer</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            var offerOnSelect = document.getElementById('id_offer_on');
+            var categorySelect = document.getElementById('id_category');
+            var productSelect = document.getElementById('id_product');
+
+            offerOnSelect.addEventListener('change', function () {
+                if (this.value === 'category') {
+                    categorySelect.classList.remove('hidden');
+                    productSelect.classList.add('hidden');
+                } else if (this.value === 'product') {
+                    categorySelect.classList.add('hidden');
+                    productSelect.classList.remove('hidden');
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+    <h1>Create Offer</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div id="categorySelect" class="hidden">
+            <label for="id_category">Category:</label>
+            <select name="category" id="id_category">
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.category_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="productSelect" class="hidden">
+            <label for="id_product">Product:</label>
+            <select name="product" id="id_product">
+                {% for product in products %}
+                    <option value="{{ product.id }}">{{ product.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit">Create</button>
+    </form>
+</body>
+</html>

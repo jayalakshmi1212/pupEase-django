@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
 
     #custom apps
     'store',
@@ -146,3 +147,4 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'jayalakshmim720@gmail.com'
 
 EMAIL_HOST_PASSWORD = 'peas vatv fbtp logj'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
