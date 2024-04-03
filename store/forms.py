@@ -9,18 +9,17 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxLengthValidator,MinLengthValidator
 
 
-
 class CategoryForm(forms.ModelForm):
+    cat_discount = forms.DecimalField(label='Category Discount', required=False)
+
     class Meta:
         model = Category
-        fields = ['category_name', 'description', 'is_active','image']
-
-
+        fields = ['category_name', 'description', 'is_active', 'image', 'cat_discount']
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'category', 'price', 'stock', 'image','is_active','description']
+        fields = ['name', 'category', 'price', 'stock', 'image','is_active','description','pro_discount']
 
 
 class UserProfileForm(forms.ModelForm):

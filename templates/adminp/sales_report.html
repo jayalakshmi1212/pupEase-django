@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .invoice-total {
+            font-weight: bold;
+        }
+
+        .invoice-print {
+            font-size: 25px;
+            cursor: pointer;
+            border: 1.5px solid black;
+            border-radius: 50%;
+            padding: 10px;
+            float: right;
+        }
+
+        .badge {
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .badge.alert-warning {
+            background-color: #ffc107;
+        }
+
+        .badge.alert-danger {
+            background-color: #dc3545;
+        }
+
+        .total-section {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div>
+            <h1>PetEase</h1>
+            <h2>Sales Report</h2>
+        </div>
+       
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in all_orders %}
+                    <tr>
+                        <td>{{ order.order_number }}</td>
+                        <td><b>{{ order.user.username }}</b></td>
+                        <td>{{ order.user.email }}</td>
+                        <td>Rs. {{ order.order_total }}</td>
+                        <td><span class="badge">{{ order.status }}</span></td>
+                        <td>{{ order.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> 
+
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+            }
+    
+            main {
+                max-width: 600px;
+                margin: 0 auto;
+                border: 1px solid black;
+                padding: 30px;
+            }
+    
+            h2 {
+                margin-bottom: 20px;
+                text-align: center;
+                font-size: 28px;
+                color: #333;
+            }
+    
+            .total-section {
+                margin-top: 30px;
+                background-color: #f9f9f9;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+            }
+    
+            .total-item {
+                margin-bottom: 15px;
+            }
+    
+            .total-item h3 {
+                margin-bottom: 5px;
+                font-size: 20px;
+                color: #555;
+            }
+    
+            .total-item p {
+                margin: 0;
+                font-size: 18px;
+                color: #333;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div>
+                <h2>petEase Sales Report</h2>
+            </div>
+    
+            <div class="total-section">
+                <h2>Total Statistics</h2>
+                <div class="total-item">
+                    <h3>Total Users</h3>
+                    <p>{{ total_users }}</p>
+                </div>
+                <div class="total-item">
+                    <h3>Total Orders</h3>
+                    <p>{{ new_orders }}</p>
+                </div>
+                <div class="total-item">
+                    <h3>Total Revenue</h3>
+                    <p>Rs. {{ revenue_total }}</p>
+                </div>
+                <div class="total-item">
+                    <h3>Total Orders This Month</h3>
+                    <p>{{ d_month_len }}</p>
+                </div>
+                <div class="total-item">
+                    <h3>Revenue This Month</h3>
+                    <p>Rs. {{ revenue_this_month }}</p>
+                </div>
+            </div>
+    </main>
+</body>
+</html>

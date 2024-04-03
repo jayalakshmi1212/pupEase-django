@@ -54,7 +54,7 @@
             </div>
         </header>
 
-        <div class="card-body">
+        <div class="card-body m-5">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -75,7 +75,7 @@
                                     {% for order_product in order.orderproduct_set.all %}
                                         <tr>
                                             <td>
-                                               
+                                               <div>
                                                 {% if order_product.product.image %}
                                                
                                                     <img src="{{ order_product.product.image.url }}" alt="Product Image" class="rounded-circle product-image">
@@ -89,9 +89,9 @@
                                             <td>{{ order_product.product.name }}</td>
                                             <td>{{ order_product.quantity }}</td>
                                             <td>{{ order_product.product_price }}</td>
-                                            <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};">{{ order.status }}</td>
+                                            <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};" >{{ order.status }} </td>
 
-                                            <td>Cash on Delivery</td>
+                                            <td>{{order.payment.payment_method}}</td>
                                             <td><a href="#" id="cancelOrderBtn">Cancel</a></td>
                                         </tr>
                                     {% endfor %}

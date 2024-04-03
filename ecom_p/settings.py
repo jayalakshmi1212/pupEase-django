@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
+    #'crispy_forms',
+    'razorpay',
 
     #custom apps
     'store',
@@ -148,3 +149,7 @@ EMAIL_HOST_USER = 'jayalakshmim720@gmail.com'
 
 EMAIL_HOST_PASSWORD = 'peas vatv fbtp logj'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+RAZOR_PAY_KEY_ID ="rzp_test_fGwLaAdAhjOjbm"
+KEY_SECRET = "7qO0FhI7y3SZGPpikcUEvVf1"

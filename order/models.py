@@ -19,6 +19,8 @@ class Payment(models.Model):
     payment_method = models.CharField(max_length=200)
     amount_paid = models.CharField(max_length=50)
     status      = models.CharField(max_length=100)
+    payment_order_id = models.CharField(max_length= 100, null=True, blank=True)
+    payment_signature   = models.CharField(max_length=100, null=True, blank=True)
     created_at  = models.DateTimeField(auto_now_add=True)
     """ spike_use = models.BooleanField(default=False)
     spike_discount = models.PositiveBigIntegerField(default = 0)
@@ -71,7 +73,21 @@ class Order(models.Model):
             self.order_number = get_random_string(length=10)
         super().save(*args, **kwargs)
 #
-        
+from django.db.models import Sum
+
+class SalesReport:
+    @staticmethod
+    def overall_sales_count():
+        return Order.objects.count()
+    
+    @staticmethod
+    def overall_order_amount():
+        return Order.objects.aggregate(total_amount=Sum('order_total'))['total_amount'] or 0
+    
+    @staticmethod
+    def overall_discount_amount():
+        return Order.objects.aggregate(total_discount=Sum('discount_amount'))['total_discount'] or 0
+
  
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -97,4 +113,26 @@ class OrderProduct(models.Model):
         super().save(*args, **kwargs)
 
     def total(self):
-        return self.product_price * self.quantity
+       return self.product_price * self.quantity
+
+
+class Wallet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    balance = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.user.first_name + str(self.balance)
+
+class Transaction(models.Model):
+    TRANSACTION_CHOICES =(
+        ("CREDIT", "Credit"),
+        ("DEBIT", "Debit"),
+        )
+    wallet           = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='transactions')
+    amount           = models.IntegerField(default=0)
+    transaction_type = models.CharField(choices=TRANSACTION_CHOICES,max_length=10)
+    created_at       = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.transaction_type + str(self.wallet) + str(self.amount)

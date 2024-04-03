@@ -1,6 +1,7 @@
-{% extends 'partials/adminbase.html'%}
+{% extends 'partials/adminbase.html' %}
 {% load static %}
-{%  block content %}
+
+{% block content %}
 <section class="content-main">
     <div class="row">
         <div class="col-9">
@@ -23,6 +24,58 @@
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             {{ form.as_p }}
+                            <!--category offer-->
+                            <div class="row px-5 mx-1">
+                                <label class="form-check my-2">
+                                    <input type="checkbox" id="toggleCatDiscount"> Apply Category Offer
+                                </label>
+                            </div>
+
+                            <div class="row px-5 mx-1" id="catDiscountRow" style="display: none;">
+                                <div class="col-lg-6">
+                                    <div class="mb-4">
+                                        <label for="cat_discount" class="form-label">Category Discount</label>
+                                        {{ form.cat_discount }}
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                // Add an event listener to detect changes in the checkbox
+                                document.getElementById('toggleCatDiscount').addEventListener('change', function () {
+                                    // Get the catDiscountRow element
+                                    var catDiscountRow = document.getElementById('catDiscountRow');
+
+                                    // Toggle its visibility based on the checkbox state
+                                    catDiscountRow.style.display = this.checked ? 'flex' : 'none';
+                                });
+                            </script>
+                            <!--category offer-->
+                            <div class="row px-5 mx-1">
+                                <label class="form-check my-2">
+                                    <input type="checkbox"  id="toggleCatDiscount"> Apply Category Offer
+                                </label>
+                            </div>
+
+                            <div class="row px-5 mx-1" id="catDiscountRow" style="display: none;">
+                                <div class="col-lg-6">
+                                    <div class="mb-4">
+                                        <label for="cat_discount" class="form-label">Category Discount</label>
+                                        {{ form.cat_discount }}
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                // Add an event listener to detect changes in the checkbox
+                                document.getElementById('toggleCatDiscount').addEventListener('change', function () {
+                                    // Get the catDiscountRow element
+                                    var catDiscountRow = document.getElementById('catDiscountRow');
+
+                                    // Toggle its visibility based on the checkbox state
+                                    catDiscountRow.style.display = this.checked ? 'flex' : 'none';
+                                });
+                            </script>
+
+
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </form>
                     </body>

@@ -1,0 +1,8 @@
+<!-- payment_success_template.html -->
+<form id="paymentForm" method="post" action="{% url 'order:payment' %}">
+    {% csrf_token %}
+    <input type="hidden" name="order_id" value="{{ order_id }}">
+    <!-- Include other necessary hidden input fields if required -->
+    <button type="submit">Complete Order</button>
+  </form>
+  

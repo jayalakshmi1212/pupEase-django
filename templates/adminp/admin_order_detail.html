@@ -22,14 +22,14 @@
                             <small class="text-muted">Order ID:{{ order.order_number}}</small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                            <select id="statusSelect" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
                                 <option>Change status</option>
                                 <option>Awaiting payment</option>
                                 <option>Confirmed</option>
                                 <option>Shipped</option>
                                 <option>Delivered</option>
                             </select>
-                            <a class="btn btn-primary" href="#">Save</a>
+                            <a id="saveStatusBtn" class="btn btn-primary" href="#">Save</a>
                             <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
                         </div>
                     </div>
@@ -156,6 +156,7 @@
                     </div>
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
+            
         </section> <!-- content-main end// -->
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">

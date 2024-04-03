@@ -19,7 +19,7 @@ from django.contrib import messages
 from userauths.models import User
 from django.db.models import Q
 from .models import Wishlist
-
+from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
 
 
 @never_cache
@@ -28,9 +28,12 @@ def index(request):
         if request.user.is_superuser:
             return redirect("adminp:admin_home")
     products = Product.objects.filter(is_active=True)  # Query the Product model
+    paginator=Paginator(products,3)
+    page=request.GET.get('page')
+    paged_products=paginator.get_page(page)
 
     context = {
-        'products': products,  # Pass the queried products to the template context
+        'products': paged_products,  # Pass the queried products to the template context
     }
     return render(request, 'store/index.html', context)
 
@@ -40,6 +43,9 @@ def shop(request):
     
     # Query the Product model
     products = Product.objects.filter(is_active=True)
+    paginator=Paginator(products,6)
+    page=request.GET.get('page')
+    paged_products=paginator.get_page(page)
     
     # Search functionality
     search_query = request.GET.get('q')
@@ -48,10 +54,10 @@ def shop(request):
             Q(name__icontains=search_query) |
             Q(description__icontains=search_query)
         )
+    
     category_slug = request.GET.get('category')
     if category_slug:
-        products = products.filter(category__slug=category_slug)
-    
+       products = products.filter(category__slug=category_slug)
     # Sorting functionality
     sort_by = request.GET.get('sort')
     if sort_by == 'popularity':
@@ -72,7 +78,7 @@ def shop(request):
         products = products.order_by('-name')
 
     context = {
-        'products': products,
+        'products': paged_products,
         'categories': categories,
         'search_query': search_query,
         'sort_by': sort_by,
@@ -391,14 +397,12 @@ def add_to_wishlist(request, product_id):
             # You can add a message or perform any other action here
             pass
     return redirect('store:product_detail', pk=product_id)
-def remove_from_wishlist(request, wishlist_id):
+
+def remove_from_wishlist(request, product_id):
     if request.user.is_authenticated:
-        wishlist_item = Wishlist.objects.get(pk=wishlist_id)
-        if wishlist_item.user == request.user:
-            wishlist_item.delete()
-    return redirect('store:wishlist')
-
-
+        wishlist_item = get_object_or_404(Wishlist, product_id=product_id, user=request.user)
+        wishlist_item.delete()
+    return redirect('store:wishlist')  # Assuming 'store' is the app namespace
 @login_required
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)

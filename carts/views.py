@@ -4,9 +4,18 @@ from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from carts.models import Cart, Cartitem
+from order.models import Order
 from store.models import Product, Addresses
 from store.forms import AddressForm
 from django.contrib import messages
+import json
+import razorpay
+from order.models import Order,Payment
+from django.conf import settings
+import datetime
+from django.http import JsonResponse,HttpResponseBadRequest
+from django.utils.crypto import get_random_string
+
 
 # Utility function to get or create a cart session
 def _cart_id(request):
@@ -86,7 +95,11 @@ def cart(request):
         cart = Cart.objects.get(cart_id=_cart_id(request))
         cart_items = Cartitem.objects.filter(cart=cart, is_active=True, product__stock__gt=0)  # Filter out-of-stock products
         for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
+            # Calculate total based on discounted price if available
+            if cart_item.product.discounted_price:
+                total += (cart_item.product.discounted_price * cart_item.quantity)
+            else:
+                total += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity
         tax = (2 * total) / 100
         grand_total = total + tax
@@ -106,6 +119,7 @@ def cart(request):
 
 @login_required
 def checkout(request):
+    print('cart/checkout')
     current_user = request.user
     form = AddressForm(user=current_user)
     addresses = Addresses.objects.filter(user=current_user, is_active=True).order_by('-is_default').distinct()
@@ -117,42 +131,62 @@ def checkout(request):
     grand_total = 0
     selected_address = None
 
-    if request.method == 'POST':
-        # Handle the delivery address form submission
-        form = AddressForm(request.POST, user=current_user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Address successfully added!")
-            # Redirect to the same page to refresh the address list
-            return redirect('carts:checkout')
-
-        # Retrieve the selected address ID from the POST request
-        selected_address_id = request.POST.get('selected_address')
-        if selected_address_id:
-            try:
-                selected_address = Addresses.objects.get(id=selected_address_id, user=current_user, is_active=True)
-            except Addresses.DoesNotExist:
-                messages.error(request, "Invalid selected address.")
 
     try:
-        if request.user.is_authenticated:
-            cart_items = Cartitem.objects.filter(user=current_user, is_active=True)
-        else:
-            cart = Cart.objects.get(cart_id=_cart_id(request))
-            cart_items = Cartitem.objects.filter(cart=cart, is_active=True)
-
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = Cartitem.objects.filter(cart=cart, is_active=True, product__stock__gt=0)  # Filter out-of-stock products
         for cart_item in cart_items:
-            total += cart_item.product.price * cart_item.quantity
+            # Calculate total based on discounted price if available
+            if cart_item.product.discounted_price:
+                total += (cart_item.product.discounted_price * cart_item.quantity)
+            else:
+                total += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity
         tax = (2 * total) / 100
         grand_total = total + tax
-    except ObjectDoesNotExist:
+    except Cart.DoesNotExist:
         pass
 
-    # Check if the order has been placed successfully
-    if 'order_placed' in request.session and request.session['order_placed']:
-        # If order has been placed, set cart_items to None
-        cart_items = None
+    if request.method == 'POST':
+        
+        # Retrieve the selected address ID from the POST request
+        # selected_address_id = request.POST.get('selected_address')
+        # if selected_address_id:
+        #     try:
+        #         selected_address = Addresses.objects.get(id=selected_address_id, user=current_user, is_active=True)
+        #     except Addresses.DoesNotExist:
+        #         messages.error(request, "Invalid selected address.")
+        payload = json.loads(request.body)
+        selected_payment_method = payload.get('selected_payment_method')
+        selected_address_id = payload.get('selected_address')
+        print( selected_payment_method )
+        print(selected_address_id,"selected address id")
+
+        draft_order = Order()
+        draft_order.user = request.user
+        draft_order.order_total = grand_total
+        # Generate order number
+        yr = int(datetime.date.today().strftime('%Y'))
+        dt = int(datetime.date.today().strftime('%d'))
+        mt = int(datetime.date.today().strftime('%m'))
+        d = datetime.date(yr, mt, dt)
+        current_date = d.strftime("%Y%m%d")
+        order_number = get_random_string(length=10) 
+        draft_order.order_number = order_number
+        draft_order.tax =tax
+        draft_order.status ='New'
+        address=Addresses.objects.get(id=selected_address_id)
+        draft_order.address=address
+        draft_order.save()
+            
+        payment = _process_payment(request.user, draft_order, selected_payment_method, grand_total)
+        print("payment_process_payment",payment)
+        draft_order.payment = Payment.objects.get(payment_order_id=payment['payment_order_id'])
+        draft_order.save()
+        print("draft_order",draft_order)
+
+        return JsonResponse({'message': 'Success', 'context': payment})
+            
 
     context = {
         'form': form,
@@ -166,3 +200,44 @@ def checkout(request):
     }
 
     return render(request, 'carts/checkout.html', context)
+
+
+
+def _process_payment(user, draft_order, payment_methods_instance, grandtotal):
+    payment = None
+    if payment_methods_instance == 'Razor-Pay':
+        print("cart/_processpayment/razorpay")
+        client = razorpay.Client(auth=(settings.RAZOR_PAY_KEY_ID, settings.KEY_SECRET))
+        data = {
+            'amount': (int(grandtotal) * 100),
+            'currency': 'INR',
+        }
+        payment1 = client.order.create(data=data)
+        payment_order_id = payment1['id']
+        payment = Payment.objects.create(
+            user = user,
+            payment_id = payment_order_id,
+            payment_method=payment_methods_instance,
+            amount_paid=0,
+            status='PENDING',
+            payment_order_id=payment_order_id,
+        )
+        payment1 = {
+            'payment_id': payment.id,
+            'payment_order_id': payment.payment_order_id,
+            'amount': (int(grandtotal) * 100),
+        }
+        return payment1
+    else:
+        print("cart/_processpayment/cod")
+        payment = Payment.objects.create(
+            payment_method=payment_methods_instance,
+            amount_paid=0,
+            payment_status='PENDING',
+            payment_order_id=draft_order.order_number
+        )
+        payment_data = {
+            'payment_id': payment.id,
+            'payment_order_id': payment.payment_order_id,
+        }
+        return payment_data

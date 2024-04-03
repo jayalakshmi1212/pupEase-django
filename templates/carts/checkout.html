@@ -33,16 +33,17 @@
                             {% csrf_token %}
                             {% if addresses %}
                             <div class="mt-5">
-                                <h3 class="fs-5 mt-5 mb-4 border-bottom pb-4">Select Shipping Address <span><a href="{% url 'order:create_address' %}" id="createAddressLink"><u> Or Create New</u></a></span></h3>
-
+                                <h3 class="fs-5 mt-5 mb-4 border-bottom pb-4">
+                                    Select Shipping Address
+                                    <span><a href="{% url 'order:create_address' %}" id="createAddressLink"><u> Or Create New</u></a></span>
+                                </h3>
                                 <!-- Checkout Panel Information-->
-                                <form method="post" action="{% url 'order:payment' %}">
+                  <form id="paymentForm" method="post" action="{% url 'order:payment' %}">
                                     {% csrf_token %}
-                                    <input type="hidden" name="selected_address_id" value="{{ selected_address.id }}">
                                     <div class="row">
                                         <!-- saved addresses-->
                                         {% for add in addresses %}
-                                <div class="col-md-6 mb-3">
+                                 <div class="col-md-6 mb-3">
                                     <div class="card">
                                         <div class="card-body">
                                         <div class="form-check form-group form-check-custom form-radio-custom form-radio-highlight mb-3">
@@ -53,7 +54,6 @@
                                                     <span class="small fw-bolder text-uppercase">{{ add.address_line_1 }},  {{ add.address_line_2 }}</span><br>
                                                     <span class="small fw-bolder text-uppercase">{{ add.city }}  {{ add.state }}</span><br>
                                                     <span class="fw-bolder">pin: {{ add.pincode }}</span> 
-                                                    <input type="hidden" name="selected_address_id" value="{{ add.id }}">
                                                 </span>
                                                 <span class="col-4"> {# Set width to 30% #}
                                                     <style>
@@ -89,7 +89,8 @@
                                                         }
                                                     </style>
                                                     <label class="custom-radio">
-                                                        <input type="radio" name="selected_address" value="{{ add.id }}">
+                                                        <!--  -->
+                                                        <input type="radio" name="selected_address"  value="{{ add.id }}">
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </span>
@@ -97,17 +98,19 @@
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                  </div>
+                                 </div>
                                         {% endfor %} 
                                     </div>
                              
-                            </div>
-                            {% endif %}
+                                 </div>
+                            
                             <!-- End of address form -->
-                        </div>
+                       
+                                 </div>
+                       
                         <!-- Address form -->
-
+                         
                         <!-- Product details -->
                         <div class="col-md-6 create-address-column">
                             <h3 class="fs-5 mt-5  mb-4 border-bottom pb-4">Product Details</h3>
@@ -133,7 +136,15 @@
                                                     <td class="product-des product-name">
                                                         <h5 class="product-name"><a href="#">{{ cart_item.product.name }}</a></h5>
                                                     </td>
-                                                    <td class="price" data-title="Price"><span>{{ cart_item.product.price }}</span></td>
+                                                    <td class="price" data-title="Price">
+                                                        {% if cart_item.product.discounted_price %}
+                                                            <!-- Display the discounted price if available -->
+                                                            <span>{{ cart_item.product.discounted_price }}</span>
+                                                        {% else %}
+                                                            <!-- If no discounted price, display the regular price -->
+                                                            <span>{{ cart_item.product.price }}</span>
+                                                        {% endif %}
+                                                    </td>
                                                     <td class="text-center" data-title="Quantity">
                                                         <div class="detail-qty border radius m-auto">
                                                             <!-- Display quantity and provide options to update quantity -->
@@ -142,7 +153,15 @@
                                                             <a href="{% url 'cart:remove_cart' cart_item.product.id %}" class="qty-down"></i></a>
                                                         </div>
                                                     </td>
-                                                    <td class="text-right" data-title="Subtotal"><span>{{ cart_item.sub_total }}</span></td>
+                                                    <td class="price" data-title="Price">
+                                                        {% if cart_item.product.discounted_price %}
+                                                            <!-- Display the discounted price if available -->
+                                                            <span>{{ cart_item.product.discounted_price }}</span>
+                                                        {% else %}
+                                                            <!-- If no discounted price, display the regular price -->
+                                                            <span>{{ cart_item.product.price }}</span>
+                                                        {% endif %}
+                                                    </td>
                                                     <td class="action" data-title="Remove">
                                                         <!-- Link to remove the product from the cart -->
                                                         <a href="{%url 'cart:remove_cart_item' cart_item.product.id%}" class="text-muted"><i class="fi-rs-trash"></i></a>
@@ -218,14 +237,29 @@
                                 </div>
                             </div>
                                
-                                <button id="placeOrderBtn" type="submit" name="submit" class="btn btn-block" disabled>Place Order</button>
+                                <button id="rzp-button1" type="submit" name="submit" class="btn btn-block" disabled>Place Order</button>
                             </div>
                             <!-- End of product details -->
                         </div>
                         <!-- Product details -->
                     </div>
                 </div>
+               {%else%}
+                                                                                 
+                           
+                
+               <h3 class="fs-5 mt-5 mb-4 border-bottom pb-4">
+
+               create your address to continue shopping 
+               <br>
+                <span><a href="{% url 'order:create_address' %}" id="createAddressLink"><u>click here to create address</u></a></span>
+            
+            </h3>
+      
+      
+                {% endif %}
             </form>
+      
             </section>
             <!--================== checkout =====================-->
         </main>
@@ -238,15 +272,16 @@
         // Get the selected address radio buttons
         var selectedAddressRadioButtons = document.querySelectorAll('input[name="selected_address"]');
         // Loop through each radio button
+
         for (var i = 0; i < selectedAddressRadioButtons.length; i++) {
             // If any radio button is checked, enable the Place Order button and return
             if (selectedAddressRadioButtons[i].checked) {
-                document.getElementById('placeOrderBtn').disabled = false;
+                document.getElementById('rzp-button1').disabled = false;
                 return;
             }
         }
         // If no address is selected, disable the Place Order button
-        document.getElementById('placeOrderBtn').disabled = true;
+        document.getElementById('rzp-button1').disabled = true;
     }
 
     // Call the function initially
@@ -259,6 +294,110 @@
     });
 </script>
         <!--===================--> 
+
+    
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+     
+    // Function to retrieve the CSRF token from the cookie
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+    
+    console.log("selectedPaymhhhhhhhhhhhhhentMethod");
+    const url = window.location.origin
+    document.getElementById('rzp-button1').addEventListener('click', function(e) {
+        var selectedAddress = document.querySelector('input[name="selected_address"]:checked').value;
+        var selectedPaymentMethod = document.querySelector('input[name="payment_option"]:checked').value;
+        var walletCheckbox = document.getElementById('walletCheckbox');
+        console.log("pppppppppppp",selectedPaymentMethod);
+        console.log("aaaaaaaaaaa",selectedAddress);
+        
+        if (selectedPaymentMethod === 'Razor-Pay') {
+            // Handle Razorpay payment
+            e.preventDefault();
+            console.log('llllllllllllllllllllllllllll');
+
+            fetch('/checkout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({
+                    selected_payment_method: selectedPaymentMethod,
+                    selected_address: selectedAddress,
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+
+                const paymentOrderId = data.context.payment_order_id;
+                const paymentAmount = data.context.amount;
+                console.log('Payment information:', paymentOrderId);
+
+                var razorpayKeyId = "rzp_test_fGwLaAdAhjOjbm";
+                console.log(razorpayKeyId);
+                console.log(paymentAmount);
+                console.log(paymentOrderId);
+               
+                var options = {
+                    "key": razorpayKeyId,
+                    "amount": paymentAmount,
+                    "name": "PetEase",
+                    "image": "{%static  'assets/imgs/banner/pupease-high-resolution-logo-transparent (1).png'%}",
+                    "order_id":paymentOrderId,
+                    "callback_url":`${url}/paymenthandler/`,
+                    "prefill": {
+                        "name": "{{ request.user.username }}",
+                        "email": "{{ request.user.email }}",
+                        "contact": "{{ request.user.phone_number }}"
+                    },
+                    "theme": {
+                        "color": "#b19361"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function(response) {
+                    alert(response.error.code);
+                });
+
+                rzp1.open();
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        } else {
+            console.log('hhhhhhhhhhhhhhhhh');
+
+    // Redirect to the payment view for other payment methods
+    var paymentForm = document.getElementById('paymentForm');
+    paymentForm.action = `${url}/payment/`; // Replace 'order:payment' with the actual URL name of your payment view
+    paymentForm.submit();
+}
+    });
+</script>
+
 
         <!--========= Preloader Start ==========-->
         
@@ -286,8 +425,5 @@
         <script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
         <script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
         <!--===================-->
-
-  
-
 
      {% endblock content %}

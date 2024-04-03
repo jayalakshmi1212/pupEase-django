@@ -6,12 +6,20 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
-from order.models import Order,OrderProduct
-from store.models import Offer, OfferProductAssociation,Category,Product
-from .forms import OfferForm
+from order.models import Order,OrderProduct,Product,Payment
+from store.models import Category,Product
 
-
-
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import datetime
+from datetime import date,timedelta
+from calendar import month_name
+from django.views import View
+from io import BytesIO
+from django.http import HttpResponse
+from django.template.loader import get_template
+import xhtml2pdf.pisa as pisa
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -40,7 +48,10 @@ def adminuser(request):
    
     if request.user.is_superuser:
         data = User.objects.all().order_by('id').values()
-        return render(request, 'adminp/admin_user.html', {'userdata': data})
+        paginator = Paginator(data, 10)
+        page = request.GET.get('page')
+        paged_data = paginator.get_page(page)
+        return render(request, 'adminp/admin_user.html', {'userdata': paged_data})
     else:
          return render(request,'adminp/admin_home.html')
     
@@ -86,7 +97,11 @@ def admin_logout(request):
 
 def order_list(request):
     orders = Order.objects.all()  # Retrieve all orders from the database
-    return render(request, 'adminp/order_list.html', {'orders': orders})
+    paginator = Paginator(orders, 10)  # Show 10 orders per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'adminp/order_list.html', {'orders': page_obj})
 
 
 
@@ -121,37 +136,134 @@ def admin_order_detail(request, order_number):
 
 
 
-#--------------------------------------------------------offer management------------------------------------------------#
 
-def offer_list(request):
-    offers = Offer.objects.all()
-    return render(request, 'offers/offer_list.html', {'offers': offers})
 
-def offer_edit(request, offer_id):
-    offer = get_object_or_404(Offer, pk=offer_id)
-    if request.method == 'POST':
-        form = OfferForm(request.POST, instance=offer)
-        if form.is_valid():
-            form.save()
-            return redirect('adminp:offer_list')
-    else:
-        form = OfferForm(instance=offer)
-    return render(request, 'offers/offer_edit.html', {'form': form})
+##############################################
 
-def block_offer(request, offer_id):
-    offer = get_object_or_404(Offer, pk=offer_id)
-    offer.status = 'inactive' if offer.status == 'active' else 'active'
-    offer.save()
-    return redirect('adminp:offer_list')
-
-def create_offer(request):
+def adminhome(request):
+    Products = Product.objects.all()
+    orders = Order.objects.filter(is_ordered=True)
     categories = Category.objects.all()
-    products = Product.objects.all()
-    if request.method == 'POST':
-        form = OfferForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('adminp:offer_list')  # Redirect to the offer list page after successful creation
-    else:
-        form = OfferForm()
-    return render(request, 'offers/create_offer.html', {'form': form, 'categories': categories, 'products': products})
+    payments = Payment.objects.filter(status='SUCCESS')
+    
+    # Calculate total revenue
+    revenue = sum(float(payment.amount_paid) for payment in payments)
+
+    # Calculate monthly revenue
+    current_month = timezone.now().month
+    monthly_payments = payments.filter(created_at__month=current_month)
+    monthly_revenue = monthly_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+
+    # Calculate user signups and orders for the past 6 months
+    current_datetime = timezone.now()
+    start_date = current_datetime - timedelta(days=180)
+    data = [['Month', 'New User Signups', 'New Orders']]
+    while start_date < current_datetime:
+        end_date = start_date.replace(day=1) + timedelta(days=31)
+        new_user_signups = User.objects.filter(date_joined__gte=start_date, date_joined__lt=end_date).count()
+        new_orders = Order.objects.filter(created_at__gte=start_date, created_at__lt=end_date).count()
+        data.append([start_date.strftime('%B'), new_user_signups, new_orders])
+        start_date = end_date
+
+    # Filter orders based on date range and status
+    all_orders = Order.objects.all().order_by('-id').exclude(status='New')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    status = request.GET.get('status')
+    if start_date:
+        all_orders = all_orders.filter(created_at__gte=start_date)
+    if end_date:
+        all_orders = all_orders.filter(created_at__lt=end_date)
+    if status and status != 'Status':
+        all_orders = all_orders.filter(status=status)
+    
+    paginator = Paginator(all_orders, 10)  # Show 10 orders per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+   
+
+    context = {
+        
+        "revenue": revenue,
+        "monthly_revenue": monthly_revenue,
+        "orders": orders,
+        "all_orders": page_obj,
+        "order_count": orders.count(),
+        "product_count": Products.count(),
+        "category_count": categories.count(),
+        'data': data,
+        
+    }
+    
+    return render(request, 'adminp/admin_home.html', context)
+
+
+class SalesReportPDFView(View):
+    def save_pdf(self,params:dict):
+        template = get_template("adminp/sales_report.html")
+        html = template.render(params)
+        response = BytesIO()
+        pdf =pisa.pisaDocument(BytesIO(html.encode('UTF-8')),response)
+        
+        if not pdf.err:
+            return HttpResponse(response.getvalue(), content_type='application/pdf'),True
+        return '',None
+    # @login_required(login_url='accounts:signin')
+    def get(self, request, *args, **kwargs):
+        # if not is_superuser(request):
+        #     return redirect('store:home')
+        total_users = len(User.objects.all())
+        new_orders = len(Order.objects.all().exclude(status="new"))
+        revenue_total = 0
+        payments = Payment.objects.filter(status = 'SUCCESS')
+        revenue_total = 0
+        for payment in payments.all():
+            revenue_total += int(float(payment.amount_paid ))   
+        current_date = date.today()
+
+        current_month = timezone.now().month
+        monthly_payments = Payment.objects.filter(
+        status='SUCCESS',
+        created_at__month=current_month
+        )
+        monthly_revenue = monthly_payments.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        status = request.GET.get('status')
+        # Convert start_date and end_date to timezone-aware datetime objects
+        start_date = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d')) if start_date else None
+        end_date = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d')) if end_date else None
+
+        # Filter orders based on date range and status
+        all_orders = Order.objects.all()
+        if start_date and end_date:
+            all_orders = all_orders.filter(created_at__gte=start_date, created_at__lt=end_date)
+        elif start_date:
+            all_orders = all_orders.filter(created_at__gte=start_date)
+        elif end_date:
+            all_orders = all_orders.filter(created_at__lt=end_date)
+        if status and status != 'Status':
+            all_orders = all_orders.filter(order_status=status)
+      
+        params = {
+            'total_users' :total_users,
+            'new_orders' : new_orders,
+            'revenue_total' : revenue_total,
+            # 'd_month' :delivered_orders_this_month,
+            'd_month_len' : len(monthly_payments),
+            'revenue_this_month' : monthly_revenue,
+            'all_orders': all_orders,  # Pass filtered orders to the template
+
+        }
+        file_name, success = self.save_pdf(params)
+        
+        if success:
+            response = HttpResponse(file_name, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="sales_report.pdf"'
+            return response
+        else:
+            # Handle error case here, like displaying an error message to the user.
+            return HttpResponse("Failed to generate the invoice.", status=500)
+

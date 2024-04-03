@@ -46,7 +46,15 @@
                                                 <td class="product-des product-name">
                                                     <h5 class="product-name"><a href="#">{{ cart_item.product.name }}</a></h5>
                                                 </td>
-                                                <td class="price" data-title="Price"><span>{{ cart_item.product.price }}</span></td>
+                                                <td class="price" data-title="Price">
+                                                    {% if cart_item.product.discounted_price %}
+                                                        <!-- Display the discounted price if available -->
+                                                        <span>{{ cart_item.product.discounted_price }}</span>
+                                                    {% else %}
+                                                        <!-- If no discounted price, display the regular price -->
+                                                        <span>{{ cart_item.product.price }}</span>
+                                                    {% endif %}
+                                                </td>
                                                 <td class="text-center" data-title="Quantity">
                                                     <div class="detail-qty border radius m-auto">
                                                         <!-- Display quantity and provide options to update quantity -->
@@ -55,7 +63,15 @@
                                                         <a href="{% url 'cart:remove_cart' cart_item.product.id %}" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                                                     </div>
                                                 </td>
-                                                <td class="text-right" data-title="Subtotal"><span>{{ cart_item.sub_total }}</span></td>
+                                                <td class="text-right" data-title="Subtotal">
+                                                    {% if cart_item.product.discounted_price %}
+                                                        <!-- Display the discounted price if available -->
+                                                        <span>{{ cart_item.product.discounted_price }}</span>
+                                                    {% else %}
+                                                        <!-- If no discounted price, display the regular price -->
+                                                        <span>{{ cart_item.product.price }}</span>
+                                                    {% endif %}
+                                                </td>
                                                 <td class="action" data-title="Remove">
                                                     <!-- Link to remove the product from the cart -->
                                                     <a href="{%url 'cart:remove_cart_item' cart_item.product.id%}" class="text-muted"><i class="fi-rs-trash"></i></a>

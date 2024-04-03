@@ -35,6 +35,37 @@
                 </div>
             </div> <!-- card end// -->
         </div>
+        <div class="col-lg-4">
+            <div class="mb-4">
+                <label class="form-input-check my-2 px-4">
+                    <input type="checkbox" {% if form.pro_discount.value %}checked{% endif %} id="toggleProDiscount"> Apply Product Offer
+                </label>
+            </div>
+            <div class="mb-4" id="proDiscountRow" {% if not form.pro_discount.value %}style="display: none;"{% endif %}>
+                <label for="pro_discount" class="form-label">Product Discount</label>
+                {{ form.pro_discount }}
+                {% if error %}
+                <label class="text-danger">{{ error.pro_discount }}</label>
+                {% endif %}                                        
+            </div>
+        </div>
+        <script>
+            // Add an event listener to detect changes in the checkbox
+            document.getElementById('toggleProDiscount').addEventListener('change', function () {
+                // Get the proDiscountRow element
+                var proDiscountRow = document.getElementById('proDiscountRow');
+                var proDiscountInput = document.getElementById('id_pro_discount'); // Get the product discount input element
+        
+                // Toggle its visibility based on the checkbox state
+                proDiscountRow.style.display = this.checked ? 'block' : 'none';
+        
+                // Clear the value of the pro_discount input if the checkbox is unchecked
+                if (!this.checked) {
+                    proDiscountInput.value = '';
+                }
+            });
+        </script>
+        
     </div>
 </section> <!-- content-main end// -->
 {% endblock content %}

@@ -39,7 +39,7 @@
                     </a>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href=""> <i class="icon material-icons md-shopping_bag"></i>
+                    <a class="menu-link" href="{%url 'store:product_list'%}"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
                     <div class="submenu">
@@ -50,7 +50,7 @@
                     </div>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href=""> <i class="icon material-icons md-shopping_bag"></i>
+                    <a class="menu-link" href="{%url 'store:category_list'%}"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">categories</span>
                     </a>
                     <div class="submenu">
@@ -70,7 +70,7 @@
              
                 
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
+                    <a class="menu-link" href="{%url 'adminp:admin_user'%}"> <i class="icon material-icons md-person"></i>
                         <span class="text">user</span>
                     </a>
                     <div class="submenu">
@@ -131,7 +131,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                        <a class="nav-link btn-icon darkmode" href="{% url 'adminp:adminlogout' %}"> <i class="material-icons md-nights_stay"></i> </a>
                     </li>
                     <li class="nav-item">
                         <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
