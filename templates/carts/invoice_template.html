@@ -9,6 +9,43 @@
     <!-- Add any necessary CSS styles here -->
 </head>
 <body>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-4 col-md-4 mb-lg-0 mb-15">
+                <span>
+                    <i class="material-icons md-calendar_today"></i> Order DATE:
+                    <b>{{ order.created_at }}</b>
+                </span> <br>
+                <small class="text-muted">Order ID: {{ order.order_number}}</small>
+            </div>
+            <div class="col-lg-4 col-md-4">
+                <div class="text">
+                    <h6 class="mb-1">Customer</h6>
+                    <small class="text-muted">CUSTOMER NAME: {{ order.user.username }}</small><br>
+                    <small class="text-muted">CUSTOMER MOBILE: {{ order.user.phone_number }}</small><br>
+                  
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+                <div class="text-center">
+                    <h6 class="mb-1">Deliver to</h6>
+                    <p class="mb-1">
+                          {% if selected_address %}
+                        <p>{{ selected_address.name }}</p>
+                        <p>{{ selected_address.address_line_1 }}</p>
+                        {% if selected_address.address_line_2 %}
+                            <p>{{ selected_address.address_line_2 }}</p>
+                        {% endif %}
+                        <p>{{ selected_address.city }}, {{ selected_address.state }}, {{ selected_address.pincode }}</p>
+                    {% else %}
+                        <p>No address selected</p>
+                    {% endif %}
+                    </p>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
     <h1>Order Invoice</h1>
     <p>Order Number: {{ order.order_number }}</p>
     <p>Order Date: {{ order.created_at }}</p>
@@ -22,6 +59,8 @@
                 <th>Product Name</th>
                 <th>Quantity</th>
                 <th>Price</th>
+                <th>Status</th>
+                <th>Payment</th>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +69,9 @@
                 <td>{{ order_product.product.name }}</td>
                 <td>{{ order_product.quantity }}</td>
                 <td>{{ order_product.product_price }}</td>
+                <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};" >{{ order.status }} </td>
+
+                <td>{{order.payment.payment_method}}</td>
             </tr>
             {% endfor %}
         </tbody>

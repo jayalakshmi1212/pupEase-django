@@ -19,7 +19,7 @@ class CategoryForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'category', 'price', 'stock', 'image','is_active','description','pro_discount']
+        fields = ['name', 'category', 'price','brand', 'stock', 'image','is_active','description','pro_discount']
 
 
 class UserProfileForm(forms.ModelForm):

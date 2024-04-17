@@ -4,8 +4,8 @@ from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from carts.models import Cart, Cartitem
-from order.models import Order
-from store.models import Product, Addresses
+from order.models import Order,Wallet,Transaction
+from store.models import Product, Addresses,Variation,Discount
 from store.forms import AddressForm
 from django.contrib import messages
 import json
@@ -29,7 +29,21 @@ def _cart_id(request):
 def add_cart(request, product_id):
     product = Product.objects.get(id=product_id)
     user = request.user
+    product_variation=[]
+    if request.method=='POST':
+        for item in request.POST:
+            key=item
+            value=request.POST[key]
+            
+            try:
+                variation=Variation.objects.get(product=product,variation_category__iexact=key,variation_value__iexact=value)
+                product_variation.append(variation)
+            except:
+                pass
 
+        
+
+   
     # Check if product is in stock
     if product.stock <= 0:
         return HttpResponse("This product is out of stock.")
@@ -48,7 +62,11 @@ def add_cart(request, product_id):
     try:
         cart_item = Cartitem.objects.get(product=product, cart=cart)
         if cart_item.quantity < product.stock:  # Check if adding more would exceed available stock
-            cart_item.quantity = F('quantity') + 1  # Ensure atomic increment of quantity
+            cart_item.quantity = F('quantity') + 1 
+            if len(product_variation) > 0:
+                cart_item.variations.clear()
+                for item in product_variation:
+                    cart_item.variations.add(item) # Ensure atomic increment of quantity
             cart_item.save()
     except Cartitem.DoesNotExist:
         if product.stock > 0:  # Ensure product is in stock before adding to cart
@@ -58,6 +76,11 @@ def add_cart(request, product_id):
                 cart=cart,
                 user=user  # Associate the cart item with the authenticated user
             )
+            if len(product_variation) > 0:
+                cart_item.variations.clear()
+                for item in product_variation:
+                    cart_item.variations.add(item)
+            cart_item.save()
 
     return redirect('cart:cart')
 
@@ -132,9 +155,11 @@ def checkout(request):
     selected_address = None
 
 
+   
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
         cart_items = Cartitem.objects.filter(cart=cart, is_active=True, product__stock__gt=0)  # Filter out-of-stock products
+        
         for cart_item in cart_items:
             # Calculate total based on discounted price if available
             if cart_item.product.discounted_price:
@@ -142,24 +167,24 @@ def checkout(request):
             else:
                 total += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity
+
         tax = (2 * total) / 100
         grand_total = total + tax
+
+        # Check if a coupon has been applied
+       
+        print('grandtotal:', grand_total)
+
     except Cart.DoesNotExist:
         pass
 
     if request.method == 'POST':
+        print('checkout/post')
         
-        # Retrieve the selected address ID from the POST request
-        # selected_address_id = request.POST.get('selected_address')
-        # if selected_address_id:
-        #     try:
-        #         selected_address = Addresses.objects.get(id=selected_address_id, user=current_user, is_active=True)
-        #     except Addresses.DoesNotExist:
-        #         messages.error(request, "Invalid selected address.")
         payload = json.loads(request.body)
         selected_payment_method = payload.get('selected_payment_method')
         selected_address_id = payload.get('selected_address')
-        print( selected_payment_method )
+        print("Selected payment method:", selected_payment_method) 
         print(selected_address_id,"selected address id")
 
         draft_order = Order()
@@ -178,8 +203,9 @@ def checkout(request):
         address=Addresses.objects.get(id=selected_address_id)
         draft_order.address=address
         draft_order.save()
-            
-        payment = _process_payment(request.user, draft_order, selected_payment_method, grand_total)
+        print(draft_order.order_number)
+        print("order/checkout/180")
+        payment = _process_payment(request.user, draft_order.order_number, selected_payment_method, grand_total)
         print("payment_process_payment",payment)
         draft_order.payment = Payment.objects.get(payment_order_id=payment['payment_order_id'])
         draft_order.save()
@@ -203,8 +229,10 @@ def checkout(request):
 
 
 
-def _process_payment(user, draft_order, payment_methods_instance, grandtotal):
+def _process_payment(user, order_number, payment_methods_instance, grandtotal):
     payment = None
+    print(order_number,"mmmmmmmmmmmmmmmm")
+    print("ordr/process_payment......................")
     if payment_methods_instance == 'Razor-Pay':
         print("cart/_processpayment/razorpay")
         client = razorpay.Client(auth=(settings.RAZOR_PAY_KEY_ID, settings.KEY_SECRET))
@@ -230,14 +258,25 @@ def _process_payment(user, draft_order, payment_methods_instance, grandtotal):
         return payment1
     else:
         print("cart/_processpayment/cod")
-        payment = Payment.objects.create(
-            payment_method=payment_methods_instance,
-            amount_paid=0,
-            payment_status='PENDING',
-            payment_order_id=draft_order.order_number
-        )
-        payment_data = {
-            'payment_id': payment.id,
-            'payment_order_id': payment.payment_order_id,
-        }
-        return payment_data
+       
+        try:
+            print(user)
+            payment = Payment.objects.create(
+                payment_method=payment_methods_instance,
+                amount_paid=0,
+                payment_id  = order_number,
+                status='PENDING',
+                payment_order_id=order_number,
+                user = user
+            )
+            print("uuuuuuuuuuuuuuu")
+            payment_data = {
+                'payment_id': payment.id,
+                'payment_order_id': payment.payment_order_id,
+            }
+            print("kkkkkkkkkkkkkkkkkkkkk")
+            print(payment)
+            print("kkkkkkkkkkkkkkkkkkkkk")
+            return payment_data
+        except Exception as e:
+            print("Error occurred:", e)

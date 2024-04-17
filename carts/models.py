@@ -1,5 +1,5 @@
 from django.db import models
-from store.models import Product
+from store.models import Product,Variation
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -19,8 +19,9 @@ def get_default_user():
     return User.objects.first().pk  
 
 class Cartitem(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None,related_name='cart_items')
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
+    variations=models.ManyToManyField(Variation,blank=True)
     cart=models.ForeignKey(Cart,on_delete=models.CASCADE)
     quantity=models.IntegerField()
     is_active=models.BooleanField(default=True)
@@ -30,5 +31,5 @@ class Cartitem(models.Model):
         return self.product.price * self.quantity
 
 
-    def __str__(self) :
+    def __unicode__(self) :
         return self.product

@@ -7,8 +7,10 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from decimal import Decimal
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
+############################------------------------category---------------------------#####################################
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50, unique=True, default='Uncategorized')
@@ -31,9 +33,22 @@ class Category(models.Model):
         return self.category_name
 
 
+######################################---------------brand-----------------###########################################
+
+class Brand(models.Model):
+    brand_name  = models.CharField(max_length=50,unique=True)
+    is_active   = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.brand_name
+############################------------------------product---------------------------#####################################
+
+
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     pro_discount = models.IntegerField(null=True, blank=True)
     stock = models.IntegerField()
@@ -72,6 +87,41 @@ class Product(models.Model):
             return discount * 100
         else:
             return 0
+
+
+class VariationManager(models.Manager):
+    def weight(self):
+        return super(VariationManager,self).filter(variation_category='weight',is_active=True)
+    
+    def Age(self):
+        return super(VariationManager,self).filter(variation_category='Age',is_active=True)
+
+variation_category_choice=(
+    ('weight','weight'),
+    ('Age','Age')
+)
+
+class Variation(models.Model):
+     product=models.ForeignKey(Product,on_delete=models.CASCADE)
+     variation_category=models.CharField(max_length=100,choices=variation_category_choice)
+     variation_value=models.CharField(max_length=100)
+     is_active=models.BooleanField(default=True)
+     created_at=models.DateTimeField(auto_now=True)
+
+     objects = VariationManager()
+
+     def __str__(self):
+        return self.variation_value
+
+     def __unicode__(self) :
+         return self.product
+     
+    
+
+
+
+############################------------------------User profile---------------------------#####################################
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile",default=None)
@@ -150,9 +200,48 @@ class Addresses(models.Model):
         return self.name  
     
 
+############################------------------------wishlist---------------------------#####################################
 
 
 class Wishlist(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
+
+
+
+############################------------------------coupon management---------------------------#####################################
+
+
+class Coupon(models.Model):
+    coupon_code         = models.CharField(max_length=100)
+    is_expired          = models.BooleanField(default=False)
+    discount_percentage = models.IntegerField(default=10, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    minimum_amount      = models.IntegerField(default=400)
+    max_uses            = models.IntegerField(default=10, validators=[MinValueValidator(0)])
+    expire_date         = models.DateField()
+    total_coupons       = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    is_active = models.BooleanField(default=True)  
+    
+
+    def save(self, *args, **kwargs):
+        # Get the current date
+        current_date = timezone.now().date()
+        
+        # Compare expire_date with current_date
+        if self.total_coupons <= 0 or self.expire_date < current_date:
+            self.is_expired = True
+        else:
+            self.is_expired = False
+        # Save the instance
+        super().save(*args, **kwargs)
+
+
+    def __str__(self):
+        return self.coupon_code
+    
+class Discount(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True, blank=True)
+    grand_total = models.DecimalField(max_digits=10, decimal_places=2)
+    date_applied = models.DateTimeField(auto_now_add=True)

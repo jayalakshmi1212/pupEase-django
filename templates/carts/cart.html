@@ -44,14 +44,21 @@
                                             <tr>
                                                 <td class="image product-thumbnail"><img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}"></td>
                                                 <td class="product-des product-name">
-                                                    <h5 class="product-name"><a href="#">{{ cart_item.product.name }}</a></h5>
+                                                    <h4 class="product-name"><a href="#">{{ cart_item.product.name }}</a></h4>
+                                                    <p class="font-xs">
+                                                        {% if cart_item.variations.all%}
+                                                          {% for item in cart_item.variations.all%}
+                                                             {{item.variation_category |capfirst}}:{{item.variation_value |capfirst}} <br>
+                                                          {%endfor%}
+                                                        {%endif%}
+                                                    </p>
                                                 </td>
                                                 <td class="price" data-title="Price">
                                                     {% if cart_item.product.discounted_price %}
                                                         <!-- Display the discounted price if available -->
                                                         <span>{{ cart_item.product.discounted_price }}</span>
                                                     {% else %}
-                                                        <!-- If no discounted price, display the regular price -->
+                                                        <!-- If no discounted price, display the regular pri ce -->
                                                         <span>{{ cart_item.product.price }}</span>
                                                     {% endif %}
                                                 </td>
@@ -64,13 +71,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-right" data-title="Subtotal">
-                                                    {% if cart_item.product.discounted_price %}
-                                                        <!-- Display the discounted price if available -->
-                                                        <span>{{ cart_item.product.discounted_price }}</span>
-                                                    {% else %}
-                                                        <!-- If no discounted price, display the regular price -->
-                                                        <span>{{ cart_item.product.price }}</span>
-                                                    {% endif %}
+                                                    <span class="font-lg fw-900 text-brand">{{total}}</span>
                                                 </td>
                                                 <td class="action" data-title="Remove">
                                                     <!-- Link to remove the product from the cart -->

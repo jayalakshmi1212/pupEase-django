@@ -3,7 +3,8 @@ from django.shortcuts import render,redirect,get_object_or_404
 from store.models import Category
 from django.views.generic import ListView
 from store.forms import CategoryForm
-from store.models import Product
+from store.models import Product,Discount
+from carts.models import Cartitem
 from store.forms import ProductForm
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -20,6 +21,10 @@ from userauths.models import User
 from django.db.models import Q
 from .models import Wishlist
 from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
+from django.http import JsonResponse
+from .models import Coupon,Brand
+import json
+from django.utils import timezone
 
 
 @never_cache
@@ -43,9 +48,8 @@ def shop(request):
     
     # Query the Product model
     products = Product.objects.filter(is_active=True)
-    paginator=Paginator(products,6)
-    page=request.GET.get('page')
-    paged_products=paginator.get_page(page)
+    brands = Brand.objects.filter(is_active=True)
+   
     
     # Search functionality
     search_query = request.GET.get('q')
@@ -56,8 +60,16 @@ def shop(request):
         )
     
     category_slug = request.GET.get('category')
+    brand_name = request.GET.get('brand')
+    print(category_slug)
     if category_slug:
        products = products.filter(category__slug=category_slug)
+       print(products)
+
+   
+    if brand_name:
+        products = products.filter(brand__brand_name=brand_name)
+
     # Sorting functionality
     sort_by = request.GET.get('sort')
     if sort_by == 'popularity':
@@ -78,10 +90,13 @@ def shop(request):
         products = products.order_by('-name')
 
     context = {
-        'products': paged_products,
+        'products': products,
         'categories': categories,
-        'search_query': search_query,
+        'brands': brands,
+        'selected_category_slug': category_slug,
         'sort_by': sort_by,
+        'search_query': search_query,
+        'selected_brand': brand_name,
     }
     return render(request, 'store/shop.html', context)
 
@@ -407,3 +422,60 @@ def remove_from_wishlist(request, product_id):
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'wishlist/wishlist.html', {'wishlist_items': wishlist_items})
+
+
+
+###################################--------------coupon-------------------##########################################
+from datetime import datetime
+
+def get_coupons(request):
+    current_time = timezone.now()
+    coupons = Coupon.objects.filter(is_active=True)
+    data = []
+    
+    for coupon in coupons:
+        coupon_data = {
+            'coupon_code': coupon.coupon_code,
+            'is_expired': coupon.is_expired,
+            'is_max_usage_reached': coupon.max_uses ,
+        }
+        
+        # Check if coupon is expired
+        current_time = datetime.now().date()
+        if coupon.expire_date and coupon.expire_date < current_time:
+            coupon_data['is_expired'] = True
+        
+        # Check if max usage limit is reached
+        if coupon.max_uses is not None :
+            coupon_data['is_max_usage_reached'] = True
+        
+        data.append(coupon_data)
+
+    return JsonResponse(data, safe=False)
+
+def apply_coupon(request):
+    if request.method == 'POST':
+        payload = json.loads(request.body)
+        coupon_code = payload.get('coupon_code')
+        print('coupon code:',coupon_code)
+        try:
+            # Perform a case-insensitive lookup of the coupon code
+            coupon = Coupon.objects.get(coupon_code__iexact=coupon_code)
+            if not coupon.is_active:
+                return JsonResponse({'status': 'error', 'message': 'Coupon is not active'})
+            if coupon.is_expired:
+                return JsonResponse({'status': 'error', 'message': 'Coupon has expired'})
+            
+            cart_items = request.user.cart_items.all()
+            total = sum(item.product.price * item.quantity for item in cart_items)
+            discount_amount = (total * coupon.discount_percentage) / 100
+            discounted_total = total - discount_amount
+            discounted_total = float(discounted_total)
+            # Save the discounted total in the session
+            request.session['discounted_total'] = discounted_total
+            # Apply discount to the total price or perform other actions as needed
+            # Example: total_price -= (total_price * coupon.discount_percentage / 100)
+            return JsonResponse({'status': 'success', 'message': 'Coupon applied successfully','discounted_total': discounted_total})
+        except Coupon.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Invalid coupon code'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})

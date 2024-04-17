@@ -16,6 +16,9 @@
             <a href="{%url 'store:account_details'%}" class="nav-link {% if request.path in '/editprofile/,/accountdetails/' %} active {% endif %}" ><i class="fi-rs-user mr-10"></i>Account details</a>
         </li>
         <li class="nav-item">
+            <a href="{% url 'store:wallet' %}" class="nav-link {% if request.path in '/wallet/' %} active {% endif %}" ><i class="fi-rs-money mr-10"></i>My Wallet</a>
+        </li>
+        <li class="nav-item">
             <a href="{%url 'order:user_orders'%}" class="nav-link {% if request.path in '/myorders/' %} active {% endif %}" ><i class="fi-rs-user mr-10"></i>My Orders</a>
         </li>
         <li class="nav-item">

@@ -78,6 +78,26 @@
                         
                     </div>
                 </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="{%url 'adminp:all_brand'%}"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Brand</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{%url 'adminp:create_brand'%}">Add Brand</a>
+                       
+                    </div>
+                </li>
+                <li class="menu-item has-submenu  {% if request.path == '/admin/all-coupon/' %}active{% endif %}" >
+                    <a class="menu-link " > <i class="icon material-icons md-local_activity"></i>
+                        <span class="text">Coupon</span>
+                    </a>
+                    <div class="submenu">
+                        <a class="{% if request.path == '/admin/manage-category/' %}active{% endif %}  p-2" href="{% url 'adminp:all_coupon' %}">
+                            <span class="text">Coupon List</span>
+                        </a>
+                    </div>
+                </li>
+               
             
                
                

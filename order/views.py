@@ -27,7 +27,8 @@ import razorpay
 from django.conf import settings
 from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.db import transaction
+from django.db.models import F
 
 
 
@@ -116,8 +117,9 @@ from datetime import timedelta
 from django.http import HttpResponse  # Import HttpResponse module
 from django.shortcuts import get_object_or_404
 def payment(request):
-    print("payment entry")
-   
+
+    print("order/payment entry")
+    
     user = request.user
     
     # Retrieve cart items
@@ -137,14 +139,12 @@ def payment(request):
     # Calculate tax and grand total
     tax = (2 * total) / 100
     grand_total = total + tax
-    
-    
-    
-    
+    grand_total = request.session.get('grand_total', grand_total)
     
     order = Order.objects.filter(user=user).last()
     print("paymeny/order1",order.__dict__)
-
+    
+    # Update payment method based on selected option
     order.status='confirmed'
     order.is_ordered = True
 
@@ -164,7 +164,7 @@ def payment(request):
     delivery_date = timezone.now() + timedelta(days=5)
     order.delivered_at = delivery_date
     order.save()
-    
+    # print('payment_method:',order.payment.payment_method)
     print("paymeny/order",order.__dict__)
     print("paymeny/orderproduct",OrderProduct)
     # Delete cart items
@@ -185,73 +185,10 @@ def payment(request):
 
 
 
-
    
 def order_success(request):
     return redirect(request,'order/order_success.html')
-    
-# def payment(request):
-#     print('order/payment')
-#     current_user = request.user
-#     cart_items = Cartitem.objects.filter(user=current_user)
-#     total = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
-#     tax = (2 * total) / 100
-#     grand_total = total + tax
-
-#     selected_address_id = request.POST.get('selected_address')
-   
-#     selected_address = None
-#     if selected_address_id:
-#         try:
-#             selected_address = Addresses.objects.get(id=selected_address_id)
-#         except Addresses.DoesNotExist:
-#             pass
-#     payment_method = request.POST.get('payment_option')
-#     payment = Payment.objects.create(
-#         user=current_user,
-#         payment_id=f'COD-{current_user.pk:05d}-{timezone.now().strftime("%Y%m%d%H%M%S")}',
-#         payment_method=payment_method,
-#         amount_paid=grand_total,
-#         status='Processed',
-#     )
-
-#     order = Order.objects.create(
-#         user=current_user,
-#         order_total=total,
-#         tax=tax,
-#         ip=request.META.get('REMOTE_ADDR'),
-#         payment=payment,
-#         address=selected_address,
-#         status='confirmed' 
-#     )
-
-#     for cart_item in cart_items:
-#         OrderProduct.objects.create(
-#             order=order,
-#             user=current_user,
-#             product=cart_item.product,
-#             quantity=cart_item.quantity,
-#             product_price=cart_item.product.price,
-#             ordered=True
-#         )
-
-#     order.is_ordered = True
-#     # Calculate the delivery date (5 days after the order date)
-#     delivery_date = timezone.now() + timedelta(days=5)
-#     order.deliverd_at = delivery_date
-#     order.save()
-#     context = {
-#         'order': order,
-#         'cart_items': cart_items,
-#         'total': total,
-#         'tax': tax,
-#         'grand_total': grand_total,
-#         'selected_address': selected_address
-#     }
-    
-
-#     cart_items.delete()
-#     return render(request, 'carts/payment.html', context)
+ 
 
 def create_address(request):
     if request.method == 'POST':
@@ -273,7 +210,10 @@ def create_address(request):
 def user_orders(request):
     print('order/user_orders')
     user = request.user
-    orders = Order.objects.filter(user=user).prefetch_related('orderproduct_set', 'address')
+    orders = Order.objects.filter(user=user).annotate(
+        latest_created_at=F('created_at')
+    ).order_by('-latest_created_at').prefetch_related('orderproduct_set', 'address')
+
 
     paginator = Paginator(orders, 6)  # Show 10 orders per page
     page_number = request.GET.get('page')
@@ -321,15 +261,20 @@ def order_detail(request, order_number):
 def cancel_order(request, order_number):
     print('order/cancel_orde')
     order = get_object_or_404(Order, order_number=order_number)
-    if order.payment_method == 'Razorpay':
-        wallet = order.user.wallet
-        transaction = Transaction.objects.create(
-            wallet=wallet,
+    if order.payment.payment_method== 'Razor-Pay':
+        print('enter into if')
+        user_wallet = Wallet.objects.get(user=order.user)
+        amount_to_credit = order.order_total
+        
+        user_wallet.balance += amount_to_credit
+        user_wallet.save()
+        print("wallet",user_wallet.balance)
+        Transaction.objects.create(
+            wallet=user_wallet,
             amount=order.order_total,
             transaction_type='CREDIT'
         )
-        wallet.balance += order.order_total
-        wallet.save()
+        print('enteredddddddddddd')
     order.status = 'cancelled'
     order.save()
     return JsonResponse({'message': 'Order cancelled successfully'})
@@ -339,10 +284,13 @@ from xhtml2pdf import pisa
 def generate_pdf(request, order_number):
     # Retrieve the order object using the order number
     order = get_object_or_404(Order, order_number=order_number)
+    selected_address = order.address  # Assigning order.address to selected_address
 
     # Render the HTML template with order details
     template_path = 'carts/invoice_template.html'
-    context = {'order': order}
+    context = {'order': order,
+                'selected_address': selected_address,
+                }
     template = get_template(template_path)
     html = template.render(context)
 
@@ -365,7 +313,7 @@ from django.urls import reverse
 
 @csrf_exempt
 def paymenthandler(request):
-    print("Payment Handler endpoint reached")
+    print("order/Payment Handler endpoint reached")
     if request.method == "POST":
         try:
             # Extract parameters from the POST request

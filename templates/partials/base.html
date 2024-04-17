@@ -210,23 +210,18 @@
                     </div>>
                     <div class="header-right">
                         <div class="search-style-2">
-                            <form action="#">
-                                <select class="select-active">
-                                    <option>All Categories</option>
-                                    <option>Women's</option>
-                                    <option>Men's</option>
-                                    <option>Cellphones</option>
-                                    <option>Computer</option>
-                                    <option>Electronics</option>
-                                    <option> Accessories</option>
-                                    <option>Home & Garden</option>
-                                    <option>Luggage</option>
-                                    <option>Shoes</option>
-                                    <option>Mother & Kids</option>
+                            <form action="{% url 'store:shop' %}" method="GET">
+                                <select name="category" class="select-active">
+                                    <option value="">All Categories</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.slug }}">{{ category.category_name }}</option>
+                                    {% endfor %}
                                 </select>
-                                <input type="text" placeholder="Search for items...">
+                                <input type="text" name="q" placeholder="Search for items..." value="{{ request.GET.q }}">
+                                <button type="submit"><i class="fi-rs-search"></i></button>
                             </form>
                         </div>
+                        
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">

@@ -1,5 +1,6 @@
 from django.urls import path
 from adminp import views
+from .views import DeleteCouponView
 
 app_name='adminp'
 
@@ -14,6 +15,18 @@ urlpatterns=[
     path('admin_order_detail/<str:order_number>/',views.admin_order_detail,name='admin_order_detail'),
     
     path('sales-report-pdf/', views.SalesReportPDFView.as_view(), name='sales_report_pdf'),
+
+    path('all_coupon/',views.all_coupon,name='all_coupon'),
+    path('create_coupon/',views.create_coupon,name='create_coupon'),
+    path('coupon/',views.all_coupon,name='coupon'),
+    path('edit_coupon/',views.edit_coupon,name='edit_coupon'),
+    path('delete_coupon/', DeleteCouponView.as_view(), name='delete_coupon'),
+
+
+    path('all_brand/', views.all_brand, name='all_brand'),
+    path('create_brand/', views.create_brand, name='create_brand'),
+    path('brand/<int:brand_id>/delete/', views.delete_brand, name='delete_brand'),
+    path('toggle_brand_active/<int:brand_id>/', views.toggle_brand_active, name='toggle_brand_active'),
 
 ]
 

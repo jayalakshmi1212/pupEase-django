@@ -1,0 +1,142 @@
+
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}
+{{user.username|title}}'s Wallet
+{% endblock %}
+
+{% block content %}
+
+<body>
+   
+ 
+
+<!--=========Main start==========-->
+<main class="main">  
+<!--===================--> 
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href=rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span><a href= rel="nofollow">Account</a>
+                <span></span> My Wallet
+            </div>
+        </div>
+    </div>
+    <section class="pt-70 pb-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% include "profile/profile-menu.html" %}  
+                        </div>
+                        <div class="col-md-8">
+                    <!--============= My Wallet ============-->
+                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>My Wallet</h5>
+                            </div>
+                            <div class="card-header">
+                                <!--referal code-->
+                                <div class="referral-code-message">
+                                    <p>This is your unique referral code:<strong class="referral-code"></strong></p>
+
+                                    <p>Share this code with your friends and earn ₹100 reward in your wallet for each successful referral!</p>
+                                    <!-- Add sharing options or copy-to-clipboard functionality here -->
+                                </div>
+                                <!--referal code-->
+                            </div>
+                           
+                            <div class="card-body d-flex align-items-center">
+                                <div class="col-md-8 d-flex justify-content-center ">
+                                    <div class="row ">
+                                        <h2 class="card-title">₹ {{wallet.balance|floatformat:2}} </h2>
+                                        <p class="card-text">Your Wallet Balance</p>
+                                    </div>
+                                </div>
+                              
+                                
+                            </div>
+                            <div class="row">
+                                
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Amount</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for transaction in transactions %}
+                                            <tr>
+                                                <td>
+                                                    
+                                                    {% if transaction.transaction_type == 'CREDIT' %}
+                                                    <span style="color: green;">{{ transaction.amount }}</span> 
+                                                    <span style="color: green;">credited</span>
+                                                    {% elif transaction.transaction_type == 'REFERRAL' %}
+                                                    <span style="color: green;">{{ transaction.amount }}</span> 
+                                                    <span style="color: green;">Refferal Offer</span>
+                                                    {% else %}
+                                                    <span style="color: red;">{{ transaction.amount }}</span> 
+                                                    <span style="color: red;">Withdrawal</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ transaction.created_at| date:"g:i ,j M, Y, " }}</td>
+                                                
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </input>
+                    <!--============= My Wallet ============-->
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
+
+
+<!--=========Main end==========-->
+</main>
+<!--===================--> 
+
+
+<!--========= Vendor JS==========-->
+<script src="{% static 'assets/js/vendor/modernizr-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/jquery-migrate-3.3.0.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/slick.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.syotimer.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/wow.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery-ui.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'assets/js/plugins/magnific-popup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/select2.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/waypoints.js' %}"></script>
+{% comment %} <script src="{% static 'assets/js/plugins/counterup1.js' %}"></script> {% endcomment %}
+<script src="{% static 'assets/js/plugins/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/images-loaded.js' %}"></script>
+<script src="{% static 'assets/js/plugins/isotope.js' %}"></script>
+<script src="{% static 'assets/js/plugins/scrollup.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.vticker-min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.theia.sticky.js' %}"></script>
+<script src="{% static 'assets/js/plugins/jquery.elevatezoom.js' %}"></script>
+<!--===================-->
+
+<!--========= Template  JS ==========-->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/shop.js' %}"></script>
+<!--===================-->
+
+{% endblock %}

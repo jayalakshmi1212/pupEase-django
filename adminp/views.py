@@ -8,7 +8,6 @@ from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from order.models import Order,OrderProduct,Product,Payment
 from store.models import Category,Product
-
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import datetime
@@ -20,6 +19,9 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
 from django.core.paginator import Paginator
+from store.models import Coupon,Brand
+from django.http import JsonResponse
+from django.db.models import Q
 
 
 # Create your views here.
@@ -96,7 +98,14 @@ def admin_logout(request):
 
 
 def order_list(request):
-    orders = Order.objects.all()  # Retrieve all orders from the database
+    orders = Order.objects.order_by('-created_at') # Retrieve all orders from the database
+    search_query = request.GET.get('q')
+    if search_query:
+        orders = orders.filter(
+            Q(order_number__icontains=search_query) |  # Search by order number
+            Q(user__username__icontains=search_query)  # Search by username
+            # Add more fields to search as needed
+        )
     paginator = Paginator(orders, 10)  # Show 10 orders per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -267,3 +276,120 @@ class SalesReportPDFView(View):
             # Handle error case here, like displaying an error message to the user.
             return HttpResponse("Failed to generate the invoice.", status=500)
 
+
+##########################################-------coupon---------###############################################
+
+
+@never_cache
+@login_required(login_url='admin_login')
+def all_coupon(request):
+    coupon = Coupon.objects.all()
+    paginator = Paginator(coupon,8)
+    page = request.GET.get('page')
+    paged_coupons = paginator.get_page(page)
+    context = { 'coupon':paged_coupons }
+    return render(request, 'adminp/all_coupon.html', context)
+
+
+@never_cache
+
+def create_coupon(request):
+    if request.method == 'POST':
+        coupon_code           = request.POST.get('coupon_code')
+        discount_percentage   = request.POST.get('discount_percentage')
+        minimum_amount        = request.POST.get('minimum_amount')
+        max_uses              = request.POST.get('max_uses')
+        expire_date           = request.POST.get('expire_date')
+        total_coupons         = request.POST.get('total_coupons')
+        expire_date = datetime.strptime(expire_date, '%d %b %Y').date()
+        coupon = Coupon.objects.create(
+            coupon_code         = coupon_code,
+            discount_percentage = int(discount_percentage),
+            minimum_amount      = int(minimum_amount),
+            max_uses            = int(max_uses),
+            expire_date         = expire_date,
+            total_coupons       = int(total_coupons),
+        )
+        coupon.save()
+        return redirect('adminp:all_coupon')
+    return render(request, 'adminp/add_coupon.html')
+
+@never_cache
+def edit_coupon(request):
+    coupon_id = request.GET.get('id')
+    old_coupon = Coupon.objects.get(id=coupon_id)
+    if request.method == 'POST':
+        coupon_code           = request.POST.get('coupon_code')
+        discount_percentage   = request.POST.get('discount_percentage')
+        minimum_amount        = request.POST.get('minimum_amount')
+        max_uses              = request.POST.get('max_uses')
+        expire_date           = request.POST.get('expire_date')
+        total_coupons         = request.POST.get('total_coupons')
+        
+        expire_date = datetime.strptime(expire_date, '%d %b %Y').date()
+        old_coupon.coupon_code         = coupon_code
+        old_coupon.discount_percentage = int(discount_percentage)
+        old_coupon.minimum_amount      = int(minimum_amount)
+        old_coupon.max_uses            = int(max_uses)
+        old_coupon.expire_date         = expire_date
+        old_coupon.total_coupons       = int(total_coupons)
+        old_coupon.save()
+        return redirect('adminp:all_coupon')
+    return render(request, 'adminp/edit_coupon.html', {'old_coupon':old_coupon})
+
+class DeleteCouponView(View):
+    def get(self, request):
+        coupon_id = request.GET.get('id')
+        coupon = Coupon.objects.get(id=coupon_id)
+        coupon.delete()
+        return redirect('adminp:all_coupon')
+    
+
+
+
+
+
+#________________________________________brand_______________________________________________#
+
+@login_required
+def all_brand(request):
+    brd = Brand.objects.all()
+    context = { 'brd':brd }
+    return render(request,'adminp/all_brand.html',context)
+
+
+@login_required
+def create_brand(request):
+    if request.method == 'POST':
+        brand = request.POST.get('brand')
+        brd = Brand(brand_name=brand)
+        brd.save()
+        return redirect('adminp:all_brand')
+    return render(request,'adminp/add_brand.html')
+
+
+
+@login_required
+def toggle_brand_active(request, brand_id):
+    brand = get_object_or_404(Brand, pk=brand_id)
+    if request.method == 'POST':
+        brand.is_active = not brand.is_active
+        brand.save()
+        # Redirect back to the admin brand page
+        return redirect('adminp:all_brand')
+    else:
+        # If the request method is not POST, return an error JSON response
+        return JsonResponse({'error': 'Invalid request method'})
+
+@login_required
+def delete_brand(request, brand_id):
+    brand = get_object_or_404(Brand, pk=brand_id)
+    is_active = brand.is_active  # Store the current active status
+    if request.method == 'POST':
+        brand.delete()
+        # If the brand was active before deletion, set is_active to False
+        if is_active:
+            return JsonResponse({'status': 'success', 'is_active': False})
+        else:
+            return JsonResponse({'status': 'success', 'is_active': True})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})

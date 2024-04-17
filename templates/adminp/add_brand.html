@@ -1,0 +1,34 @@
+{% extends 'partials/adminbase.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Add Brand</h2>
+                
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <!-- <div class="card-header">
+                </div> -->
+                <div class="card-body">
+                    <form method="post" action="{% url 'adminp:create_brand' %}">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label  class="form-label">Brand</label>
+                            <input type="text" placeholder="Type here" class="form-control"name="brand" required autocomplete="off">
+                        </div>
+                        <div>
+                            
+                            <button class="btn btn-md rounded font-sm hover-up" type="submit">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div> <!-- card end// -->
+            
+        </div>
+    </div>
+</section> <!-- content-main end// -->
+{% endblock content %}

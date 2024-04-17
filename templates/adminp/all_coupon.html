@@ -1,0 +1,79 @@
+{% extends 'partials/adminbase.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Coupon List </h2>
+        </div>
+        <div>
+            <a href="{% url 'adminp:create_coupon' %}" class="btn btn-primary btn-sm rounded">Add new</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="align-middle" scope="col">Coupon Code</th>
+                                    <th class="align-middle" scope="col">Total Coupons</th>
+                                    <th class="align-middle" scope="col">Discount %</th>
+                                    <th class="align-middle" scope="col">Minimum Amount</th>
+                                    <th class="align-middle" scope="col">Max usage</th>
+                                    <th class="align-middle" scope="col">Expiry Date</th>
+                                    <th class="align-middle" scope="col">Status</th>
+                                    <th class="align-middle" scope="col" class="text-end"> Action </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in coupon %}
+                                <tr>
+                                    <!-- <td  class="fw-bold"><span>{{i.order_number|slice:"14:"}}</span></td> -->
+                                    <td  class="fw-bold"><span>{{i.coupon_code}}</span></td>
+                                    <td>{{i.total_coupons}}</td>
+                                    <td><b>{{i.discount_percentage}} %</b></td>
+                                    <td>$ {{i.minimum_amount}}</td>
+                                    <td>{{i.max_uses}}</td>
+                                    <td>{{i.expire_date|date:"d M Y"}}</td>
+                                    <td>
+                                        {% if i.is_expired %}
+                                            <span class="badge rounded-pill alert-warning">Expired</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill alert-success">Active</span>
+                                        {% endif %}
+                                        
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'adminp:edit_coupon' %}?id={{i.id}}" class="btn badge alert-primary">Edit</a>
+                                        <a href="{% url 'adminp:delete_coupon' %}?id={{i.id}}" class="btn badge alert-danger"><i class="fa-sharp fa-light fa-trash"></i></a>
+                                    </td>
+                                
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div> <!-- table-responsive //end -->
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+            <div class="pagination-area mt-15 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        {% if coupon.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}"><i class="material-icons md-chevron_left"></i></a></li>
+                        {% endif %}
+                        {% for i in coupon.paginator.page_range %}
+                                {% if coupon.number == i %}
+                                    <li class="page-item active"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        {% if coupon.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}"><i class="material-icons md-chevron_right"></i></a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+    {% endblock content %}

@@ -1,0 +1,69 @@
+{% extends 'partials/adminbase.html' %}
+{% load static %}
+{% block content %}
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Brands</h2>
+
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body  w-100  justify-content-center">
+            <div class="row d-flex justify-content-center align-items-center">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="font--bold font-xxl">Brands</th>
+                            <th class="font--bold font-xxl">Active Status</th>
+                            <th class="font--bold font-xxl">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in brd %}
+                        <tr>
+                            <td>{{ b.brand_name }}</td>
+                            <td>{% if b.is_active %} Active {% else %} Inactive {% endif %}</td>
+                            <td>
+                                <!-- Button to delete the brand -->
+                               
+                                <!-- Button to toggle the active status -->
+                                <form method="post" action="{% url 'adminp:toggle_brand_active' b.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">
+                                        {% if b.is_active %} Deactivate {% else %} Activate {% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+    </div>
+    <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                {% if atributes.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ atributes.previous_page_number }}"><i
+                            class="material-icons md-chevron_left"></i></a></li>
+                {% endif %}
+                {% for i in atributes.paginator.page_range %}
+                {% if atributes.number == i %}
+                <li class="page-item active"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if atributes.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ atributes.next_page_number }}"><i
+                            class="material-icons md-chevron_right"></i></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</section> <!-- content-main end// -->
+{% endblock content %}

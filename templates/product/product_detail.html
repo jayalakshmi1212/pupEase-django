@@ -17,28 +17,55 @@
 </head>
 <body>
     <div class="container mt-5">
-        <div class="row">
+      <div class="row">
+       
             <div class="col-md-6">
                 <img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.name }}">
             </div>
+       
             <div class="col-md-6">
+        <form method="post" action="{% url 'cart:add_cart' product.id %}">
+             {% csrf_token%}
                 <h2>{{ product.name }}</h2>
+                <br>
+                <h6>Brand: {{ product.brand }}</h6>
                 <p>Category: {{ product.category }}</p>
                 <p>Price: ${{ product.price }}</p>
                 {% if product.discounted_price %}
                     <p>Discounted Price: ${{ product.discounted_price }}</p>
                 {% endif %}
                 <p>Stock: {{ product.stock }}</p>
-                <p>Created Date: {{ product.created_date }}</p>
                 <p>Description: {{ product.description }}</p>
-    
+                <div class="row">
+                    {% if product.category == "food" %}
+                    <div class="col-sm-6">
+                        <select name="weight" class="form-control" required>
+                            <option value="" disabled selected><h6>Weight</h6></option>
+                            {% for variation in product.variation_set.weight %}
+                            <option value="{{ variation.variation_value | lower }}">{{ variation.variation_value | capfirst }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-sm-6">
+                        <select name="Age" class="form-control" required>
+                            <option value="" disabled selected><h6>Age</h6></option>
+                            {% for variation in product.variation_set.Age %}
+                            <option value="{{ variation.variation_value | lower }}">{{ variation.variation_value | capfirst }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+
+                 <br>
                 <!-- Display either "Go to Cart" button or "Add to Cart" button based on product_in_cart variable -->
                 {% if product_in_cart %}
                 <a href="{% url 'cart:cart' %}" class="btn btn-primary">Go to Cart</a>
             {% else %}
                 <div class="row">
                     <div class="col">
-                        <form method="post" action="{% url 'cart:add_cart' product.id %}">
+                       
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ product.id }}">
                             {% if product.stock <= 0 %}
@@ -46,14 +73,22 @@
                             {% else %}
                                 <button type="submit" class="btn btn-primary">Add to Cart</button>
                             {% endif %}
-                        </form>
+        </form>
                     </div>
                     <div class="col">
-                        <form method="post" action="{% url 'store:add_to_wishlist' product.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="product_id" value="{{ product.id }}">
-                            <button type="submit" class="btn btn-danger">Add to wishlist</button> <!-- Heart icon button for adding to wishlist -->
-                        </form>
+                        {% if product_in_wishlist %}
+                            <form method="post" action="{% url 'store:remove_from_wishlist' product.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="btn btn-danger">Remove from wishlist</button> <!-- Button to remove from wishlist -->
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'store:add_to_wishlist' product.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="btn btn-danger">Add to wishlist</button> <!-- Heart icon button for adding to wishlist -->
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}
@@ -72,4 +107,7 @@
 
 </body>
 </html>
+<br>
+<br>
+<br>
 {% endblock content %}

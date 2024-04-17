@@ -1,5 +1,8 @@
 from django.urls import path
 from store import views
+from wallet.views import wallet as walletviews
+from wallet.views import paymenthandler2 as paymenthandlerView
+
 
 app_name='store'
 
@@ -43,5 +46,16 @@ urlpatterns=[
     path('wishlist/',views.wishlist,name='wishlist'),
     path('add_to_wishlist/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('remove_from_wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
+    #wallet
+    path('wallet/',walletviews, name='wallet'),
+    path('paymenthandler2/',paymenthandlerView,name='paymenthandler2'),
+    
+    #coupon
+    path('apply_coupon/',views.apply_coupon,name='apply_coupon'),
+    path('get_coupons/',views.get_coupons,name='get_coupons'),
+
+    #brand
+    
 ]
     
