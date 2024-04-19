@@ -101,7 +101,7 @@ class OrderProduct(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.product.product_name 
+        return self.product.name 
     
     def save(self, *args, **kwargs):
         if not self.pk:  # if this is a new OrderProduct instance

@@ -169,12 +169,15 @@ def checkout(request):
             quantity += cart_item.quantity
 
         tax = (2 * total) / 100
-        grand_total = total + tax
-
-        # Check if a coupon has been applied
        
-        print('grandtotal:', grand_total)
 
+        discounted_total = request.session.get('discounted_total')
+        if discounted_total:
+            grand_total = discounted_total
+        else:
+            grand_total = total + tax
+
+        print('grandtotal:', grand_total)
     except Cart.DoesNotExist:
         pass
 

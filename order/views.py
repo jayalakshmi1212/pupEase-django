@@ -139,7 +139,7 @@ def payment(request):
     # Calculate tax and grand total
     tax = (2 * total) / 100
     grand_total = total + tax
-    grand_total = request.session.get('grand_total', grand_total)
+    discounted_total = request.session.get('discounted_total', grand_total)
     
     order = Order.objects.filter(user=user).last()
     print("paymeny/order1",order.__dict__)
@@ -147,6 +147,8 @@ def payment(request):
     # Update payment method based on selected option
     order.status='confirmed'
     order.is_ordered = True
+
+    grand_total = discounted_total
 
     # Create OrderProduct instances
     for cart_item in cart_items:
@@ -164,6 +166,7 @@ def payment(request):
     delivery_date = timezone.now() + timedelta(days=5)
     order.delivered_at = delivery_date
     order.save()
+    del request.session['discounted_total']
     # print('payment_method:',order.payment.payment_method)
     print("paymeny/order",order.__dict__)
     print("paymeny/orderproduct",OrderProduct)

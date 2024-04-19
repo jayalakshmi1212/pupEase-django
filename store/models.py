@@ -239,7 +239,13 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.coupon_code
-    
+
+
+class CouponUsage(models.Model):
+    Coupon=models.ForeignKey(Coupon,on_delete=models.CASCADE)
+    user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.DO_NOTHING)
+    is_used=models.BooleanField(default=False)
+     
 class Discount(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, null=True, blank=True)

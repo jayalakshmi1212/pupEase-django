@@ -25,6 +25,7 @@ from django.http import JsonResponse
 from .models import Coupon,Brand
 import json
 from django.utils import timezone
+from carts.models import Cart
 
 
 @never_cache
@@ -453,29 +454,53 @@ def get_coupons(request):
 
     return JsonResponse(data, safe=False)
 
+
+def _cart_id(request):
+    cart = request.session.session_key
+    if not cart:
+        cart = request.session.create()
+    return cart
+
+from decimal import Decimal
 def apply_coupon(request):
+    print('apply coupon entry')
     if request.method == 'POST':
         payload = json.loads(request.body)
         coupon_code = payload.get('coupon_code')
         print('coupon code:',coupon_code)
-        try:
-            # Perform a case-insensitive lookup of the coupon code
-            coupon = Coupon.objects.get(coupon_code__iexact=coupon_code)
-            if not coupon.is_active:
-                return JsonResponse({'status': 'error', 'message': 'Coupon is not active'})
-            if coupon.is_expired:
-                return JsonResponse({'status': 'error', 'message': 'Coupon has expired'})
             
-            cart_items = request.user.cart_items.all()
-            total = sum(item.product.price * item.quantity for item in cart_items)
-            discount_amount = (total * coupon.discount_percentage) / 100
-            discounted_total = total - discount_amount
-            discounted_total = float(discounted_total)
-            # Save the discounted total in the session
-            request.session['discounted_total'] = discounted_total
-            # Apply discount to the total price or perform other actions as needed
-            # Example: total_price -= (total_price * coupon.discount_percentage / 100)
-            return JsonResponse({'status': 'success', 'message': 'Coupon applied successfully','discounted_total': discounted_total})
+        try:
+            coupon = Coupon.objects.get(coupon_code=coupon_code)
+            if not coupon.is_expired:
+                # Apply discount to the total price
+                # You need to implement this logic based on your models
+                cart = Cart.objects.get(cart_id=_cart_id(request))
+                user = request.user
+                cart_items = user.cart_items.filter(cart=cart,is_active=True, product__stock__gt=0)
+
+                print("Cart items:")
+                for cart_item in cart_items:
+                    print(cart_item.product.name)
+                
+                # Calculate total price of all cart items
+                total = sum(cart_item.sub_total() for cart_item in cart_items)
+                
+                # Calculate tax
+                tax = (2 * total) / 100
+                
+                # Calculate grand total
+                grand_total = total + tax
+                
+                # Apply discount based on coupon
+                discount_percentage = Decimal(coupon.discount_percentage)
+                discount_amount = (discount_percentage / 100) * grand_total
+                new_total_price = grand_total - discount_amount
+                new_total_price = float(new_total_price)
+                request.session['discounted_total'] = new_total_price
+                return JsonResponse({'success': True, 'new_total_price': new_total_price})
+            else:
+                return JsonResponse({'success': False, 'message': 'Coupon is expired'})
         except Coupon.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Invalid coupon code'})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+            return JsonResponse({'success': False, 'message': 'Invalid coupon code'})
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})

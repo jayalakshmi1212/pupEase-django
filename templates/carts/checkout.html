@@ -192,29 +192,33 @@
                                     </tr>
                                     <tr>
                                         <td class="cart_total_label">Total</td>
-                                        <td class="cart_total_amount"><strong><span class="
-
-                                            font-xl fw-900 text-brand">{{grand_total}}</span></strong></td>
+                                        <td class="cart_total_amount">
+                                            <strong>
+                                                <span id="totalPrice" class="font-xl fw-900 text-brand">{{grand_total}}</span>
+                                            </strong>
+                                        </td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <br>
-                        <button id="checkCouponButton">Check Coupons</button>
+                                            <!-- Button to open the coupon modal -->
+                    <button id="couponBtn" class="btn btn-primary">Apply Coupon</button>
 
-                        <!-- Modal to display available coupons and enter coupon code -->
-                        <div id="couponModal" class="modal">
-                            <div class="modal-content">
-                                <span class="close">&times;</span>
-                                <h2>Available Coupons</h2>
-                                <ul id="couponList"></ul>
-                                <form id="applyCouponForm">
-                                    <input type="text" id="couponCode" name="couponCode"  placeholder="Enter coupon code">
-                                    <button type="button" onclick="applyCoupon()">Apply Coupon</button>
-                                </form>
-                            </div>
-                        </div>
+                    <!-- Modal -->
+                    <div id="couponModal" class="modal">
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2>Apply Coupon</h2>
+                        <form id="couponForm">
+                        <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code">
+                        <button type="submit">Apply</button>
+                        </form>
+                    </div>
+                    </div>
+
                         <br>
                         <!-- Payment Method -->
                         <div class="payment_method">
@@ -239,6 +243,7 @@
                                 </div>
                                 
                             </div>
+                            
     
                             <!-- Place Order Button -->
                             <button id="rzp-button1" type="submit" name="submit" class="btn btn-block" disabled>Place Order</button>
@@ -423,75 +428,82 @@
 }
     });
 ///////////////////////////////////////////coupon/////////////////////////////////////////////////////////////
+// Get the modal
+var modal = document.getElementById("couponModal");
 
-// Display the modal when the Check Coupons button is clicked
-document.getElementById("checkCouponButton").addEventListener("click", function() {
-    document.getElementById("couponModal").style.display = "block";
-    // Fetch available coupons and populate the modal
-    fetch('/get_coupons/')  // Endpoint to fetch available coupons
-        .then(response => response.json())
-        .then(data => {
-            const couponList = document.getElementById("couponList");
-            couponList.innerHTML = "";
-            data.forEach(coupon => {
-                // Create a list item for each coupon and attach click event listener
-                const li = document.createElement("li");
-                li.textContent = coupon.coupon_code;
-                li.setAttribute("data-coupon-code", coupon.coupon_code);
-                li.addEventListener("click", function() {
-                    applyCoupon(coupon.coupon_code);
-                });
-                couponList.appendChild(li);
-            });
-        })
-        .catch(error => console.error('Error:', error));
-});
+// Get the button that opens the modal
+var btn = document.getElementById("couponBtn");
 
-// Close the modal when the close button is clicked
-document.getElementsByClassName("close")[0].addEventListener("click", function() {
-    document.getElementById("couponModal").style.display = "none";
-});
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
 
-// Apply coupon logic
-function applyCoupon(couponCode) {
-    console.log('Coupon code:', couponCode);
-    fetch('/apply_coupon/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ coupon_code: couponCode })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // Update total price or take other actions upon successful application
-            alert('Coupon applied successfully');
-    
-        } else {
-            // Display error message to the user
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error));
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+  modal.style.display = "block";
 }
 
-// Function to get CSRF token from cookies
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+// Handle form submission
+document.getElementById("couponForm").addEventListener("submit", function(event) {
+  event.preventDefault(); // Prevent form submission
+  
+  var couponCode = document.getElementById("couponCode").value;
+  console.log("Coupon Code:", couponCode);
+  
+  // Send AJAX request to server to validate coupon code
+  fetch('/apply_coupon/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken,
+    },
+    body: JSON.stringify({ coupon_code: couponCode }),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-    return cookieValue;
+    return response.json();
+  })
+  .then(data => {
+    // Check if the coupon is valid
+    if (data.success) {
+        // Update total price if coupon is valid
+        var newTotalPrice = data.new_total_price;
+        updateTotal(newTotalPrice);
+        console.log("Coupon applied successfully!");
+    } else {
+        // Display error message if coupon is invalid
+        console.error("Invalid coupon code:", data.message);
+    }
+})
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+  });
+});
+
+// Function to update total price after applying coupon
+function updateTotal(newTotal) {
+    var totalElement = document.getElementById('totalPrice');
+    if (totalElement) {
+        // Ensure newTotal is parsed as a number before using toFixed
+        var formattedTotal = parseFloat(newTotal).toFixed(2);
+        totalElement.innerText = formattedTotal;
+    } else {
+        console.error('Total element not found in the DOM');
+    }
 }
+
 </script>
 
 <style>
