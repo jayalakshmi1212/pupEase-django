@@ -21,17 +21,21 @@
                             </span> <br>
                             <small class="text-muted">Order ID:{{ order.order_number}}</small>
                         </div>
-                        <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <select id="statusSelect" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                <option>Change status</option>
-                                <option>Awaiting payment</option>
-                                <option>Confirmed</option>
-                                <option>Shipped</option>
-                                <option>Delivered</option>
-                            </select>
-                            <a id="saveStatusBtn" class="btn btn-primary" href="#">Save</a>
-                            <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
-                        </div>
+                        <form id="statusForm" action="{% url 'adminp:update_order_status' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <div class="form-group">
+                                <label for="statusSelect">Change Status:</label>
+                                <select class="form-select" id="statusSelect" name="status">
+                                    <option value="Awaiting payment" {% if order.status == "Awaiting payment" %} selected {% endif %}>Awaiting payment</option>
+                                    <option value="Confirmed" {% if order.status == "Confirmed" %} selected {% endif %}>Confirmed</option>
+                                    <option value="Shipped" {% if order.status == "Shipped" %} selected {% endif %}>Shipped</option>
+                                    <option value="Delivered" {% if order.status == "Delivered" %} selected {% endif %}>Delivered</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                        
                     </div>
                 </header> <!-- card-header end// -->
                 <div class="card-body">

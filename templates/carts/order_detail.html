@@ -121,16 +121,32 @@
         </div>
     </div>
 </div>
+<div class="container mt-4">
+    {% for order_product in order.orderproduct_set.all %}
+    <h5>Payment Summary</h5>
+    <ul>
+        <li>Payment Method: {{order.payment.payment_method}}</li>
+        <li>Total Amount: {{ order_product.product_price }}</li>
+        <li>payment status:{{ order.status }}</li>
+        <!-- Add more payment-related fields as needed -->
+    </ul>
+    {% endfor %}
+</div>
 <script>
     // Function to handle cancel/return button behavior
     function handleCancelReturnButton(orderStatus) {
         var cancelBtn = document.getElementById("cancelOrderBtn");
         // Check if the order status is "cancelled" or "delivered"
-        if (orderStatus === "cancelled" || orderStatus === "delivered") {
+        if (orderStatus === "cancelled") {
             // Disable the button
             cancelBtn.disabled = true;
-            // Change button text to "Cancelled" or "Returned" accordingly
-            cancelBtn.innerText = (orderStatus === "cancelled") ? "Cancelled" : "Returned";
+            // Change button text to "Cancelled"
+            cancelBtn.innerText = "Cancelled";
+        } else if (orderStatus === "delivered") {
+            // Enable the button
+            cancelBtn.disabled = false;
+            // Change button text to "Return"
+            cancelBtn.innerText = "Return";
         } else {
             // Enable the button
             cancelBtn.disabled = false;
@@ -175,6 +191,7 @@
         document.getElementById("cancelOrderBtn").innerText = "Cancelled";
     });
 </script>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

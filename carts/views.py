@@ -101,10 +101,25 @@ def remove_cart(request, product_id):
 def remove_cart_item(request, product_id):
     cart = Cart.objects.get(cart_id=_cart_id(request))
     product = get_object_or_404(Product, id=product_id)
-    cart_item = Cartitem.objects.get(product=product, cart=cart)
-    cart_item.delete()
-    return redirect('cart:cart')
 
+    # Get the selected variants from the request
+    selected_variants = {}
+    for key, value in request.POST.items():
+        if key.startswith('variant_'):
+            variant_name = key.split('_')[1]
+            selected_variants[variant_name] = value
+
+    # Filter Cartitem instances based on the product and selected variants
+    cart_items = Cartitem.objects.filter(product=product, cart=cart)
+    for variant_name, variant_value in selected_variants.items():
+        cart_items = cart_items.filter(variations__variation_category__iexact=variant_name, 
+                                       variations__variation_value__iexact=variant_value)
+
+    if cart_items.exists():
+        # Delete all cart items associated with the given product and variants
+        cart_items.delete()
+
+    return redirect('cart:cart')
 
 # View to display the cart
 def cart(request):

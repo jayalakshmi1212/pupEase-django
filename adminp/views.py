@@ -142,6 +142,23 @@ def admin_order_detail(request, order_number):
 
 
 
+def update_order_status(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        status = request.POST.get('status')
+
+        # Fetch the order object
+        order = Order.objects.get(pk=order_id)
+
+        # Update the status of the order
+        order.status = status
+        order.save()
+
+        # Redirect back to the admin order detail page
+        return redirect('adminp:admin_order_detail', order_number=order.order_number)
+    else:
+        # If the request method is not POST, redirect to some error page
+        return redirect('error_page_url')
 
 
 
@@ -346,6 +363,29 @@ class DeleteCouponView(View):
     
 
 
+class ToggleCouponStatusView(View):
+    def post(self, request):
+        coupon_id = request.POST.get('id')
+        try:
+            coupon = Coupon.objects.get(id=coupon_id)
+            # Toggle the active status of the coupon
+            coupon.is_active = not coupon.is_active
+            coupon.save()
+            return JsonResponse({'success': True, 'message': 'Coupon status toggled successfully'})
+        except Coupon.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Coupon not found'}, status=404)
+
+# Inside your views.py file
+from django import template
+
+register = template.Library()
+
+@register.simple_tag
+def coupon_button_text(is_active):
+    if is_active:
+        return 'Deactivate'
+    else:
+        return 'Activate'
 
 
 
@@ -393,3 +433,12 @@ def delete_brand(request, brand_id):
         else:
             return JsonResponse({'status': 'success', 'is_active': True})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+def edit_brand(request, brand_id):
+    brand = get_object_or_404(Brand, pk=brand_id)
+    if request.method == 'POST':
+        brand.brand_name = request.POST.get('brand_name')
+        brand.save()
+        return redirect('adminp:all_brand')
+    return render(request, 'adminp/edit_brand.html', {'brand': brand})

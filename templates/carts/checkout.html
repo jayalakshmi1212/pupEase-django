@@ -203,11 +203,14 @@
                             </div>
                         </div>
                         <br>
-                                            <!-- Button to open the coupon modal -->
+                        
+                        <!-- Button to open the coupon modal -->
                     <button id="couponBtn" class="btn btn-primary">Apply Coupon</button>
 
                     <!-- Modal -->
                     <div id="couponModal" class="modal">
+                                            <!-- Your HTML template -->
+                    
                     <!-- Modal content -->
                     <div class="modal-content">
                         <span class="close">&times;</span>
@@ -216,8 +219,12 @@
                         <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code">
                         <button type="submit">Apply</button>
                         </form>
+                        
                     </div>
+
                     </div>
+                    <button class="btn btn-sm remove-coupon-btn" data-coupon-id="{{ coupon.id }}">Remove Coupon</button>
+
 
                         <br>
                         <!-- Payment Method -->
@@ -469,6 +476,7 @@ document.getElementById("couponForm").addEventListener("submit", function(event)
     },
     body: JSON.stringify({ coupon_code: couponCode }),
   })
+  
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -503,6 +511,60 @@ function updateTotal(newTotal) {
         console.error('Total element not found in the DOM');
     }
 }
+
+
+
+
+
+// Add an event listener to the Remove Coupon button
+document.querySelector('.remove-coupon-btn').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default form submission
+    
+    // Send AJAX request to remove the coupon
+    fetch('/remove_coupon/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Check if the coupon was successfully removed
+        if (data.success) {
+            // Update the total price with the new total from the response
+            updateTotal(data.new_total);
+            console.log("Coupon removed successfully!");
+        } else {
+            console.error("Failed to remove coupon:", data.message);
+        }
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+});
+
+// Function to update total price after applying or removing coupon
+function updateTotal(newTotal) {
+    console.log('New Total:', newTotal); 
+    var totalElement = document.getElementById('totalPrice');
+    if (totalElement) {
+        // Ensure newTotal is parsed as a number before using toFixed
+        var formattedTotal = isNaN(newTotal) ? 'NaN' : parseFloat(newTotal).toFixed(2);
+        console.log('Formatted Total:', formattedTotal);
+        totalElement.innerText = formattedTotal;
+    } else {
+        console.error('Total element not found in the DOM');
+    }
+}
+
+// Fetch available coupons and populate the select dropdown
+
 
 </script>
 

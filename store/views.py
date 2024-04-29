@@ -26,6 +26,8 @@ from .models import Coupon,Brand
 import json
 from django.utils import timezone
 from carts.models import Cart
+from django.db.models import Value, CharField
+from django.db.models.functions import Lower
 
 
 @never_cache
@@ -71,6 +73,9 @@ def shop(request):
     if brand_name:
         products = products.filter(brand__brand_name=brand_name)
 
+    if category_slug and brand_name:
+        products = products.filter(category__slug=category_slug, brand__brand_name=brand_name)
+
     # Sorting functionality
     sort_by = request.GET.get('sort')
     if sort_by == 'popularity':
@@ -85,11 +90,11 @@ def shop(request):
         products = products.order_by('-created_date')  # Adjust field name if needed
     elif sort_by == 'featured':
         products = products.filter(is_featured=True)  # Adjust field name if needed
+        
     elif sort_by == 'a_to_z':
-        products = products.order_by('name')
+        products = products.annotate(lower_name=Lower('name')).order_by('lower_name')
     elif sort_by == 'z_to_a':
-        products = products.order_by('-name')
-
+        products = products.annotate(lower_name=Lower('name')).order_by('-lower_name')
     context = {
         'products': products,
         'categories': categories,
@@ -102,6 +107,9 @@ def shop(request):
     return render(request, 'store/shop.html', context)
 
 
+
+def about(request):
+    return render(request,"store/about.html")
 
 #________________________category_management___________________________________________
 #_____________________________________________________________________________________
@@ -213,7 +221,9 @@ def add_product(request):
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    return render(request, 'product/product_detail.html', {'product': product})
+    product_price_puppy = float(product.price_puppy)
+    return render(request, 'product/product_detail.html', {'product': product,'product_price_puppy':product_price_puppy})
+
 
 
 
@@ -379,27 +389,41 @@ def defaultaddress(request, pk):
 # .......................................................filter.................................................................
     
 
-
 def shop0(request):
-    products = Product.objects.filter(is_active=True).order_by('name')
-    context = {'products': products}
+    products = Product.objects.filter(is_active=True).annotate(lower_name=Lower('name')).order_by('lower_name')
+    categories = Category.objects.filter(is_active=True)
+    brands = Brand.objects.filter(is_active=True)
+    
+    context = {'products': products, 'categories': categories, 'brands': brands}
     return render(request, 'store/shop.html', context)
 
 def shop1(request):
-    products = Product.objects.filter(is_active=True).order_by('-name')
-    context = {'products': products}
+    products = Product.objects.filter(is_active=True).annotate(lower_name=Lower('name')).order_by('-lower_name')
+    categories = Category.objects.filter(is_active=True)
+    brands = Brand.objects.filter(is_active=True)
+    context = {'products': products, 'categories': categories, 'brands': brands}
     return render(request, 'store/shop.html', context)
 
 def shop_ase_price(request):
     products = Product.objects.filter(is_active=True).order_by('price')
-    context = {'products': products}
+    categories = Category.objects.filter(is_active=True)
+    brands = Brand.objects.filter(is_active=True)
+    context = {'products': products, 'categories': categories, 'brands': brands}
     return render(request, 'store/shop.html', context)
 
 def shop_des_price(request):
     products = Product.objects.filter(is_active=True).order_by('-price')
-    context = {'products': products}
+    categories = Category.objects.filter(is_active=True)
+    brands = Brand.objects.filter(is_active=True)
+    context = {'products': products, 'categories': categories, 'brands': brands}
     return render(request, 'store/shop.html', context)
 
+def shop_new_arrivals(request):
+    products = Product.objects.filter(is_active=True).order_by('-created_date')
+    categories = Category.objects.filter(is_active=True)
+    brands = Brand.objects.filter(is_active=True)
+    context = {'products': products, 'categories': categories, 'brands': brands}
+    return render(request, 'store/shop.html', context)
 
 # ----------------------------------------wishlist--------------------------------------------------------?
 
@@ -411,7 +435,7 @@ def add_to_wishlist(request, product_id):
         if not created:
             # Item already exists in the wishlist
             # You can add a message or perform any other action here
-            pass
+             messages.warning(request, f"{product.name} is already in your wishlist.")
     return redirect('store:product_detail', pk=product_id)
 
 def remove_from_wishlist(request, product_id):
@@ -428,32 +452,14 @@ def wishlist(request):
 
 ###################################--------------coupon-------------------##########################################
 from datetime import datetime
+# views.py
+
+from django.http import JsonResponse
+from .models import Coupon
 
 def get_coupons(request):
-    current_time = timezone.now()
     coupons = Coupon.objects.filter(is_active=True)
-    data = []
-    
-    for coupon in coupons:
-        coupon_data = {
-            'coupon_code': coupon.coupon_code,
-            'is_expired': coupon.is_expired,
-            'is_max_usage_reached': coupon.max_uses ,
-        }
-        
-        # Check if coupon is expired
-        current_time = datetime.now().date()
-        if coupon.expire_date and coupon.expire_date < current_time:
-            coupon_data['is_expired'] = True
-        
-        # Check if max usage limit is reached
-        if coupon.max_uses is not None :
-            coupon_data['is_max_usage_reached'] = True
-        
-        data.append(coupon_data)
-
-    return JsonResponse(data, safe=False)
-
+    return render(request, 'carts:checkout', {'coupons': coupons})
 
 def _cart_id(request):
     cart = request.session.session_key
@@ -504,3 +510,38 @@ def apply_coupon(request):
             return JsonResponse({'success': False, 'message': 'Invalid coupon code'})
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+
+
+
+
+from django.views.generic import View
+
+class RemoveCouponView(View):
+    def post(self, request):
+        # Remove the discounted total from the session if it exists
+        if 'discounted_total' in request.session:
+            del request.session['discounted_total']
+            request.session.modified = True
+        
+        # Return a JSON response indicating success
+        return JsonResponse({'success': True})
+    
+
+def remove_coupon(request):
+    print('enter remove_coupon')
+    try:
+        del request.session['discounted_total']  # Remove the discounted total from the session
+
+        # Recalculate the total price without the coupon discount
+        # You need to implement this logic based on your models
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        user = request.user
+        cart_items = user.cart_items.filter(cart=cart, is_active=True, product__stock__gt=0)
+        total = sum(cart_item.sub_total() for cart_item in cart_items)
+        tax = (2 * total) / 100
+        grand_total = total + tax
+        print(grand_total)
+        return JsonResponse({'success': True, 'new_total': grand_total})
+    except KeyError:
+        return JsonResponse({'success': False, 'message': 'Coupon not found in session'})

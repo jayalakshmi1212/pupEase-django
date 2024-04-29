@@ -1,0 +1,20 @@
+{% extends 'partials/adminbase.html' %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <h2 class="content-title">Edit Brand</h2>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="brand_name">Brand Name:</label>
+                    <input type="text" id="brand_name" name="brand_name" value="{{ brand.brand_name }}" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

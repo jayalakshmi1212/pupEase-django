@@ -166,7 +166,8 @@ def payment(request):
     delivery_date = timezone.now() + timedelta(days=5)
     order.delivered_at = delivery_date
     order.save()
-    del request.session['discounted_total']
+    if 'discounted_total' in request.session:
+       del request.session['discounted_total']
     # print('payment_method:',order.payment.payment_method)
     print("paymeny/order",order.__dict__)
     print("paymeny/orderproduct",OrderProduct)
@@ -174,7 +175,7 @@ def payment(request):
     cart_items.delete()
     dummy_orders=Order.objects.filter(is_ordered = False)
     dummy_orders.delete()
-
+    
     context = {
         'order': order,
         'total': total,

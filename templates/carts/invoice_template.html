@@ -76,6 +76,17 @@
             {% endfor %}
         </tbody>
     </table>
+    <div class="container mt-4">
+        {% for order_product in order.orderproduct_set.all %}
+        <h5>Payment Summary</h5>
+        <ul>
+            <li>Payment Method: {{order.payment.payment_method}}</li>
+            <li>Total Amount: {{ order_product.product_price }}</li>
+            <li>payment status:{{ order.status }}</li>
+            <!-- Add more payment-related fields as needed -->
+        </ul>
+        {% endfor %}
+    </div>
 
     <!-- Add any additional sections or information about the order -->
 

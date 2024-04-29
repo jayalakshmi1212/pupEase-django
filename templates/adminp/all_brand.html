@@ -35,6 +35,7 @@
                                         {% if b.is_active %} Deactivate {% else %} Activate {% endif %}
                                     </button>
                                 </form>
+                                <a href="{% url 'adminp:edit_brand' b.id %}" class="btn btn-warning">Edit</a>
                             </td>
                         </tr>
                         {% endfor %}

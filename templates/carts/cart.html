@@ -30,7 +30,7 @@
                                         <th scope="col">Name</th>
                                         <th scope="col">Price</th>
                                         <th scope="col">Quantity</th>
-                                        <th scope="col">Subtotal</th>
+                                        <!-- <th scope="col">Subtotal</th> -->
                                         <th scope="col">Remove</th>
                                     </tr>
                                 </thead>
@@ -70,9 +70,9 @@
                                                         <a href="{% url 'cart:remove_cart' cart_item.product.id %}" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                                                     </div>
                                                 </td>
-                                                <td class="text-right" data-title="Subtotal">
-                                                    <span class="font-lg fw-900 text-brand">{{total}}</span>
-                                                </td>
+                                                <!-- <td class="text-right" data-title="Subtotal">
+                                                    <span class="font-lg fw-900 text-brand">{{ cart_item.product.price }}</span>
+                                                </td> -->
                                                 <td class="action" data-title="Remove">
                                                     <!-- Link to remove the product from the cart -->
                                                     <a href="{%url 'cart:remove_cart_item' cart_item.product.id%}" class="text-muted"><i class="fi-rs-trash"></i></a>

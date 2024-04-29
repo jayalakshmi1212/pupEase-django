@@ -9,6 +9,7 @@ app_name='store'
 urlpatterns=[
     path("",views.index,name='index'),
     path("shop/",views.shop,name='shop'),
+    path("about/",views.about,name='about'),
 
     #category
     path('categories/', views.CategoryListView.as_view(), name='category_list'),
@@ -40,7 +41,8 @@ urlpatterns=[
     path('shop0/',views.shop0,name='shop0'),
     path('shop1/',views.shop1,name='shop1'),
     path('shop_ase_price/',views.shop_ase_price,name='shop_ase_price'),
-    path('shop_des_price/',views.shop_des_price,name='shop_des_price'),                                         
+    path('shop_des_price/',views.shop_des_price,name='shop_des_price'), 
+    path('shop_new_arrivals/',views.shop_new_arrivals,name='shop_new_arrivals'),                                        
     
     #wishlist
     path('wishlist/',views.wishlist,name='wishlist'),
@@ -54,7 +56,7 @@ urlpatterns=[
     #coupon
     path('apply_coupon/',views.apply_coupon,name='apply_coupon'),
     path('get_coupons/',views.get_coupons,name='get_coupons'),
-
+    path('remove_coupon/', views.remove_coupon, name='remove_coupon'),
     #brand
     
 ]

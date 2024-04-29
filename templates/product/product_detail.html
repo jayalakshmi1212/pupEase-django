@@ -30,7 +30,8 @@
                 <br>
                 <h6>Brand: {{ product.brand }}</h6>
                 <p>Category: {{ product.category }}</p>
-                <p>Price: ${{ product.price }}</p>
+                <p> <span id="product-price" data-price="{{ product.price }}" data-puppy-price="{{ product.price_puppy }}">{{ product.price }}</span></p>
+
                 {% if product.discounted_price %}
                     <p>Discounted Price: ${{ product.discounted_price }}</p>
                 {% endif %}
@@ -48,12 +49,18 @@
                     </div>
                     {% endif %}
                     <div class="col-sm-6">
-                        <select name="Age" class="form-control" required>
+                        <select name="Age" class="form-control" id="variant-selection" required>
                             <option value="" disabled selected><h6>Age</h6></option>
                             {% for variation in product.variation_set.Age %}
-                            <option value="{{ variation.variation_value | lower }}">{{ variation.variation_value | capfirst }}</option>
+                                {% if variation.variation_value == "Puppy" %}
+                                  <option value="{{ variation.variation_value | lower }}" data-price="{{ product.price_puppy }}">{{ variation.variation_value | capfirst }}</option>
+
+                                {% else %}
+                                    <option value="{{ variation.variation_value | lower }}" data-price="{{ product.price }}">{{ variation.variation_value | capfirst }}</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
+                        
                     </div>
                 </div>
                 
@@ -68,6 +75,7 @@
                        
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="variant_price" id="variant-price">
                             {% if product.stock <= 0 %}
                                 <span><h5 class="text-danger">Out of Stock</h5></span>
                             {% else %}
@@ -77,11 +85,7 @@
                     </div>
                     <div class="col">
                         {% if product_in_wishlist %}
-                            <form method="post" action="{% url 'store:remove_from_wishlist' product.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="product_id" value="{{ product.id }}">
-                                <button type="submit" class="btn btn-danger">Remove from wishlist</button> <!-- Button to remove from wishlist -->
-                            </form>
+                         <span><h5 class="text-danger">Out of Stock</h5></span>
                         {% else %}
                             <form method="post" action="{% url 'store:add_to_wishlist' product.id %}">
                                 {% csrf_token %}
@@ -95,16 +99,104 @@
             </div>
         </div>
     </div>
-    
+<script>
+    // Get the messages from Django's messages framework
+    {% for message in messages %}
+        // Display the messages using JavaScript alert or other UI component
+        alert("{{ message }}");
+    {% endfor %}
+</script>  
 <!-- Include your JavaScript libraries here -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Include your custom scripts here -->
+<!-- <script>
+    // Get the select element
+    const variantSelect = document.getElementById('variant-selection');
+    // Get the product price element
+    const productPrice = document.getElementById('product-price');
+    // Store the default price
+    let defaultPrice = productPrice.textContent;
+    // Get the puppy price from the data attribute
+    let puppyPrice = productPrice.dataset.puppyPrice;
+    
+   
+
+    // Add event listener for change event on select element
+    variantSelect.addEventListener('change', function() {
+        // Get the selected option
+        const selectedOption = variantSelect.options[variantSelect.selectedIndex];
+        // Get the price from the data attribute
+        const price = selectedOption.dataset.price;
+        // Get the variant value
+        const variantValue = selectedOption.value;
+
+        if (variantValue.toLowerCase() === 'puppy') {
+            // If the selected variant is "puppy", update the price to the puppy price
+            productPrice.textContent = `Price: $${puppyPrice}`;;
+        } else if (price !== undefined) {
+            // If the selected variant is not "puppy" and the price is defined, update the price
+            productPrice.textContent = `Price: $${price}`;
+        } else {
+            // If the price is undefined, revert to the default price
+            productPrice.textContent = defaultPrice;
+        }
+    });
+</script> -->
 <script>
-    // Add your custom JavaScript code here
+    // Get the select element
+    const variantSelect = document.getElementById('variant-selection');
+    // Get the product price element
+    const productPrice = document.getElementById('product-price');
+    // Store the default price
+    let defaultPrice = parseFloat(productPrice.textContent.slice(8)); // Remove "Price: $" and parse as float
+
+    // Get the puppy price from the data attribute
+    let puppyPrice = parseFloat(productPrice.dataset.puppyPrice);
+
+    // Get the hidden input field for variant price
+    const variantPriceInput = document.getElementById('variant-price');
+
+    // Add event listener for change event on select element
+    variantSelect.addEventListener('change', function() {
+        // Get the selected option
+        const selectedOption = variantSelect.options[variantSelect.selectedIndex];
+        // Get the price from the data attribute
+        let price;
+        if (selectedOption.value.toLowerCase() === 'puppy') {
+            price = puppyPrice;
+        } else if (selectedOption.value.toLowerCase() === 'adult') {
+            price = defaultPrice;
+        } else {
+            price = parseFloat(selectedOption.dataset.price);
+        }
+        // Get the variant value
+        const variantValue = selectedOption.value;
+
+        if (!isNaN(price)) {
+            // Update the price
+            productPrice.textContent = `Price: $${price.toFixed(2)}`;
+        } else {
+            // If the price is not a valid number, revert to the default price
+            productPrice.textContent = `Price: $${defaultPrice.toFixed(2)}`;
+        }
+
+        // Set the variant price in the hidden input field
+        variantPriceInput.value = price;
+        console.log('variantpriceinput',variantPriceInput)
+    });
+
+     // JavaScript code to handle variant selection
+    // Update the hidden input field with the selected variant price
+    variantSelect.addEventListener('change', function() {
+        const selectedOption = variantSelect.options[variantSelect.selectedIndex];
+        const price = parseFloat(selectedOption.dataset.price);
+        document.getElementById('variant-price').value = price;
+    });
 </script>
 
+ 
 </body>
 </html>
 <br>

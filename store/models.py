@@ -49,7 +49,8 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)# price of adult
+    price_puppy = models.DecimalField(max_digits=10, decimal_places=2,default=0.00)  # Price for puppy variant
     pro_discount = models.IntegerField(null=True, blank=True)
     stock = models.IntegerField()
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
