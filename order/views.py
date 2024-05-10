@@ -29,6 +29,7 @@ from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import transaction
 from django.db.models import F
+from order.models import Shipping_Addresses
 
 
 
@@ -175,6 +176,21 @@ def payment(request):
     cart_items.delete()
     dummy_orders=Order.objects.filter(is_ordered = False)
     dummy_orders.delete()
+
+    shipping_address, created = Shipping_Addresses.objects.get_or_create(
+    user=order.address.user,
+    name=order.address.name,
+    phone_number=order.address.phone_number,
+    address_line_1 = order.address.address_line_1 , 
+    address_line_2 = order.address.address_line_2 , 
+    city = order.address.city , 
+    country = order.address.country ,
+    state = order.address.state , 
+    pincode = order.address.pincode , 
+    
+)
+    order.shipping_address = shipping_address
+    order.save()
     
     context = {
         'order': order,
@@ -214,9 +230,18 @@ def create_address(request):
 def user_orders(request):
     print('order/user_orders')
     user = request.user
-    orders = Order.objects.filter(user=user).annotate(
+    orders = Order.objects.filter(
+        user=user,
+        status__in=['New', 'confirmed', 'failed']  # Include orders with status "New", "confirmed", or "failed"
+    ).annotate(
         latest_created_at=F('created_at')
     ).order_by('-latest_created_at').prefetch_related('orderproduct_set', 'address')
+    for order in orders:
+      print(f"Order Number: {order.order_number}, Status: {order.status}")
+    
+    for order in orders:
+        if order.status == 'failed':
+            order.save()  # Ensure all failed orders are marked as failed in the database
 
 
     paginator = Paginator(orders, 6)  # Show 10 orders per page
@@ -224,6 +249,14 @@ def user_orders(request):
     page_obj = paginator.get_page(page_number)
 
     orders_info = []
+    for order in orders:
+       print(f"Order Number: {order.order_number}, Status: {order.status}")
+    
+    # Check if the order status is "failed" and take action accordingly
+       if order.status == 'failed':
+        # Perform some action for failed orders
+        print("This order has failed.")
+
     for order in page_obj:
         products_info = []
         for order_product in order.orderproduct_set.all():
@@ -242,6 +275,7 @@ def user_orders(request):
             'selected_address': order.address,
             'products_info': products_info,
         })
+        
 
     return render(request, 'carts/user_orders.html', {'user_orders': orders_info, 'page_obj': page_obj})
 
@@ -251,6 +285,10 @@ def order_detail(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
     selected_address = order.address  # Assigning order.address to selected_address
     
+    if order.payment and order.payment.status == 'failed':
+        order.status = 'failed'
+        order.save()
+
     # Fetching related order products
     order_products = order.orderproduct_set.all()
 
@@ -361,10 +399,33 @@ def paymenthandler(request):
             #return HttpResponseRedirect(reverse('order:payment'))  # Change 'payment_success' to the actual URL name of your payment success page
         except Exception as e:
             print('Exception:', str(e))
-            return render(request, 'order_templates/paymentfail.html')
+            try:
+                # Retrieve the payment object associated with the failed transaction
+                payment = Payment.objects.get(payment_order_id=razorpay_order_id)
+                payment.status = 'failed'
+                payment.save()
+
+                # Update the order status to "failed"
+                order = Order.objects.get(payment=payment)
+                order.status = 'failed'
+                order.save()
+            except Payment.DoesNotExist:
+                pass  # Handle the case where payment object doesn't exist
+
+            return render(request, 'carts/paymentfail.html')
     else:
         print('non-post request is recieved')
         print('Invalid request method.')
         return redirect('cart:checkout')
 
 
+
+def Failedpayments(request):
+     # Query failed payments
+    failed_payments = Payment.objects.filter(status='failed')
+
+    context = {
+        'failed_payments': failed_payments,
+    }
+    # Pass failed payment details to the template
+    return render(request, 'carts/failedpayments.html',  context)

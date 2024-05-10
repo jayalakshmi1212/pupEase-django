@@ -90,6 +90,14 @@ class Product(models.Model):
             return 0
 
 
+class Sale(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity_sold = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.product.name} - {self.quantity_sold}"
+
+
 class VariationManager(models.Manager):
     def weight(self):
         return super(VariationManager,self).filter(variation_category='weight',is_active=True)

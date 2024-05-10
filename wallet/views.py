@@ -10,13 +10,20 @@ from django.http import JsonResponse,HttpResponseBadRequest
 from django.contrib import messages
 from store.models import User
 from order.models import Wallet
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def wallet(request):
+    
+
     user = request.user
     wallet, created = Wallet.objects.get_or_create(user=user, defaults={'balance': 0})
     transactions = Transaction.objects.filter(wallet=wallet).all().order_by('-id')
-    context = {'wallet': wallet, 'transactions': transactions}
+    paginator = Paginator(transactions,3 )  # Show 6 transactions per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'wallet': wallet, 'page_obj': page_obj}
+
     
     
     return render(request, 'profile/wallet.html', context)
@@ -63,5 +70,5 @@ def paymenthandler2(request):
     else:
         return redirect('store:index')
     
-# def payment_failed(request):
-#     return render(request, 'profile/paymentfail.html')
+def payment_failed(request):
+    return render(request, 'carts/paymentfail.html')

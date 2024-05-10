@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara - Order Failure</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/public/user/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/public/user/assets/css/main.css?v=3.4">
+    <style>
+        /* Custom CSS for Order Failed Page */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #dc3545;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #dc3545;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #c82333;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card">
+        <div class="mb-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="text-danger" width="75" height="75"
+                fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                <path d="M8.482.046a.738.738 0 0 0-1.002 0L.193 14.292a.738.738 0 0 0 1.204.814L8 3.317l6.603 11.789a.738.738 0 0 0 1.204-.814L8.482.046zM8 12a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm.006-3a.75.75 0 0 0-.75.75v.5a.75.75 0 0 0 1.5 0v-.5a.75.75 0 0 0-.75-.75z"/>
+            </svg>
+        </div>
+        <div class="text-center">
+            <h1>Order Failed!</h1>
+            <p>Sorry, your order could not be processed.if you want to try again click the button.</p>
+            <a href="{% url 'store:index' %}" class="btn">Return to Home</a>
+            <a href="{% url 'cart:checkout' %}" class="btn">Try again</a>
+        </div>
+    </div>
+</div>
+
+
+    
+
+<!-- Vendor JS-->
+<script src="/public/user/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+<script src="/public/user/assets/js/vendor/jquery-3.6.0.min.js"></script>
+<script src="/public/user/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+<script src="/public/user/assets/js/vendor/bootstrap.bundle.min.js"></script>
+<script src="/public/user/assets/js/plugins/slick.js"></script>
+<script src="/public/user/assets/js/plugins/jquery.syotimer.min.js"></script>
+<script src="/public/user/assets/js/plugins/wow.js"></script>
+<script src="/public/user/assets/js/plugins/jquery-ui.js"></script>
+<script src="/public/user/assets/js/plugins/perfect-scrollbar.js"></script>
+<script src="/public/user/assets/js/plugins/magnific-popup.js"></script>
+<script src="/public/user/assets/js/plugins/select2.min.js"></script>
+<script src="/public/user/assets/js/plugins/waypoints.js"></script>
+<script src="/public/user/assets/js/plugins/counterup.js"></script>
+<script src="/public/user/assets/js/plugins/jquery.countdown.min.js"></script>
+<script src="/public/user/assets/js/plugins/images-loaded.js"></script>
+<script src="/public/user/assets/js/plugins/isotope.js"></script>
+<script src="/public/user/assets/js/plugins/scrollup.js"></script>
+<script src="/public/user/assets/js/plugins/jquery.vticker-min.js"></script>
+<!-- Template  JS -->
+<script src="./public/user/assets/js/main.js?v=3.4"></script>
+<script src="./public/user/assets/js/shop.js?v=3.4"></script>
+</body>
+</html>

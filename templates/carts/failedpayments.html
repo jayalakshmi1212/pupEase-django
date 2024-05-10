@@ -1,0 +1,26 @@
+<!-- failed_payment.html -->
+{% if failed_payments %}
+    <h1>Failed Payments</h1>
+    <ul>
+        {% for payment in failed_payments %}
+            <li>
+                <p>Payment ID: {{ payment.payment_id }}</p>
+                <!-- Display other payment details -->
+                <p>Amount: {{ payment.amount_paid }}</p>
+                <p>Status: {{ payment.status }}</p>
+                <!-- Display product details -->
+                <p>Product Name: {{ payment.orderproduct.product.name }}</p>
+                <p>Product Image: <img src="{{ payment.orderproduct.product.image.url }}" alt="Product Image"></p>
+                <!-- Display address details -->
+                <p>Address: {{ payment.order.address }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+    <!-- Retry button -->
+    <form action="{% url 'cart:checkout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Retry Payment</button>
+    </form>
+{% else %}
+    <p>No failed payments</p>
+{% endif %}

@@ -463,7 +463,69 @@
                 $('#myTable').DataTable();
             });
         </script> {% endcomment %}
-   
+       <script>
+        function fetchMonthlyData() {
+            fetch('{% url 'adminp:monthly_data' %}')
+            .then(response => response.json())
+            .then(data => {
+                // Handle monthly data
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error fetching monthly data:', error);
+            });
+      }
+
+        function fetchYearlyData() {
+            fetch('{% url 'adminp:yearly_data' %}')
+            .then(response => response.json())
+            .then(data => {
+                // Handle yearly data
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error fetching yearly data:', error);
+            });
+        }
+
+       </script>
+
+       <div class="row">
+        <div class="col-lg-4">
+            <div class="card card-body mb-4">
+                <h5 class="card-title">Top 5 Best-Selling Products</h5>
+                <ul class="list-group">
+                    {% for product in top_selling_products %}
+                        <li class="list-group-item">{{ product.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Display top 10 best-selling categories -->
+        <div class="col-lg-4">
+            <div class="card card-body mb-4">
+                <h5 class="card-title">Top 5 Best-Selling Categories</h5>
+                <ul class="list-group">
+                    {% for category in top_selling_categories %}
+                        <li class="list-group-item">{{ category.category_name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Display top 10 best-selling brands -->
+        <div class="col-lg-4">
+            <div class="card card-body mb-4">
+                <h5 class="card-title">Top 5 Best-Selling Brands</h5>
+                <ul class="list-group">
+                    {% for brand in top_selling_brands %}
+                        <li class="list-group-item">{{ brand.brand_name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
     
         <!--orders and pagination ends-->
 </section> <!-- content-main end// -->

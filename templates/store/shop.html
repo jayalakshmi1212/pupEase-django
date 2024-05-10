@@ -19,21 +19,21 @@
                         <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
                         <ul class="categories">
                             {% for category in categories %}
-                            <li><a href="?category={{ category.slug }}">{{ category.category_name }}</a></li>
+                            <li><a href="?category={{ category.slug }}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}">{{ category.category_name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
-                    <!-- Other sidebar widgets can be added here -->
                     <br>
                     <div class="widget-brand">
                         <h5 class="section-title style-1 mb-30 wow fadeIn animated">Brand</h5>
                         <ul class="brands">
                             {% for brand in brands %}
-                            <li><a href="?brand={{ brand.brand_name }}">{{ brand.brand_name }}</a></li>
+                            <li><a href="?brand={{ brand.brand_name }}{% if selected_category_slug %}&category={{ selected_category_slug }}{% endif %}">{{ brand.brand_name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
                 </div>
+                
                 <div class="col-lg-9">
                     <div class="shop-product-fillter">
                         <div class="totall-product">

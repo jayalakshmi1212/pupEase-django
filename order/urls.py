@@ -14,5 +14,6 @@ urlpatterns = [
     path('cancel_order/<str:order_number>/',views.cancel_order,name='cancel_order'),
      path('generate-pdf/<str:order_number>/', views.generate_pdf, name='generate_pdf'),
     path('paymenthandler/',views.paymenthandler,name='paymenthandler'),
+    path('failedpayments/',views.Failedpayments,name='failedpayments'),
     
 ]

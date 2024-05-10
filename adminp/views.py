@@ -170,6 +170,7 @@ def adminhome(request):
     Products = Product.objects.all()
     orders = Order.objects.filter(is_ordered=True)
     categories = Category.objects.all()
+    brands = Brand.objects.all()
     payments = Payment.objects.filter(status='SUCCESS')
     
     # Calculate total revenue
@@ -179,6 +180,20 @@ def adminhome(request):
     current_month = timezone.now().month
     monthly_payments = payments.filter(created_at__month=current_month)
     monthly_revenue = monthly_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+    
+
+    
+    # Top 10 best selling products
+    top_selling_products = Product.objects.annotate(total_quantity_sold=Sum('sale__quantity_sold')).order_by(
+        '-total_quantity_sold')[:5]
+
+    # Top 10 best selling categories
+    top_selling_categories = Category.objects.annotate(total_quantity_sold=Sum('product__sale__quantity_sold')).order_by(
+        '-total_quantity_sold')[:5]
+
+    # Top 10 best selling brands
+    top_selling_brands = Brand.objects.annotate(total_quantity_sold=Sum('product__sale__quantity_sold')).order_by(
+        '-total_quantity_sold')[:5]
 
     # Calculate user signups and orders for the past 6 months
     current_datetime = timezone.now()
@@ -219,10 +234,52 @@ def adminhome(request):
         "product_count": Products.count(),
         "category_count": categories.count(),
         'data': data,
+        "brands": brands,
+        "top_selling_products": top_selling_products,
+        "top_selling_categories": top_selling_categories,
+        "top_selling_brands": top_selling_brands,
         
     }
     
     return render(request, 'adminp/admin_home.html', context)
+
+
+from django.http import JsonResponse
+from django.db.models import Sum
+from datetime import datetime
+
+def monthly_data_view(request):
+    # Calculate monthly revenue
+    current_month = datetime.now().month
+    monthly_payments = Payment.objects.filter(created_at__month=current_month)
+    monthly_revenue = monthly_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+
+    # Your other calculations for monthly data
+
+    # Serialize the data
+    data = {
+        'monthly_revenue': monthly_revenue,
+        # Add other monthly data here
+    }
+
+    return JsonResponse(data)
+
+def yearly_data_view(request):
+    # Calculate yearly revenue
+    current_year = datetime.now().year
+    yearly_payments = Payment.objects.filter(created_at__year=current_year)
+    yearly_revenue = yearly_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+
+    # Your other calculations for yearly data
+
+    # Serialize the data
+    data = {
+        'yearly_revenue': yearly_revenue,
+        # Add other yearly data here
+    }
+
+    return JsonResponse(data)
+
 
 
 class SalesReportPDFView(View):

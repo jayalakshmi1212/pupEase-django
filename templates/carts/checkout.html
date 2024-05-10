@@ -186,9 +186,14 @@
                                         <td class="cart_total_label">Tax</td>
                                         <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">{{tax}}</span></td>
                                     </tr>
+
                                     <tr>
                                         <td class="cart_total_label">Shipping</td>
                                         <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cart_total_label">Coupon Discount Percentage</td>
+                                        <td class="cart_total_amount"><span class="font-lg fw-900 text-brand" id="couponDiscountPercentage">0%</span></td>
                                     </tr>
                                     <tr>
                                         <td class="cart_total_label">Total</td>
@@ -232,14 +237,23 @@
                             <div class="mb-25">
                                 <h5>Payment</h5>
                             </div>
-                            <div class="payment_option">
-                                <div class="custome-radio">
-                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="" value="COD">
-                                    <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#cashOnDelivery" aria-controls="cashOnDelivery">Cash on Delivery</label>
-                                    <div class="form-group collapse in" id="cashOnDelivery">
-                                        <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
+                                <div class="payment_option">
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="" value="COD">
+                                        <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#cashOnDelivery" aria-controls="cashOnDelivery">Cash on Delivery</label>
+                                        <div class="form-group collapse in" id="cashOnDelivery">
+                                            {% if messages %}
+                                                {% for message in messages %}
+                                                    <div class="alert alert-{{ message.tags }}" role="alert">
+                                                        {{ message }}
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                            <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
+                                        </div>
                                     </div>
                                 </div>
+                                
                                 <div class="custome-radio">
                                     <input class="form-check-input" required="" type="radio" name="payment_option" id="razorpayOption" value="Razor-Pay">
                                     <label class="form-check-label" for="razorpayOption" data-bs-toggle="collapse" data-target="#razorpay" aria-controls="razorpay"><strong class="text-dark">Razorpay Online Payment</strong></label>
@@ -488,7 +502,8 @@ document.getElementById("couponForm").addEventListener("submit", function(event)
     if (data.success) {
         // Update total price if coupon is valid
         var newTotalPrice = data.new_total_price;
-        updateTotal(newTotalPrice);
+        var discountPercentage = data.discount_percentage;
+        updateTotal(newTotalPrice,discountPercentage);
         console.log("Coupon applied successfully!");
     } else {
         // Display error message if coupon is invalid
@@ -501,7 +516,7 @@ document.getElementById("couponForm").addEventListener("submit", function(event)
 });
 
 // Function to update total price after applying coupon
-function updateTotal(newTotal) {
+function updateTotal(newTotal,discountPercentage) {
     var totalElement = document.getElementById('totalPrice');
     if (totalElement) {
         // Ensure newTotal is parsed as a number before using toFixed
@@ -510,6 +525,13 @@ function updateTotal(newTotal) {
     } else {
         console.error('Total element not found in the DOM');
     }
+    // Update coupon discount display
+    var discountPercentageElement = document.getElementById('discountPercentage');
+        if (discountPercentageElement) {
+            discountPercentageElement.innerText = discountPercentage + '%';
+        } else {
+            console.error('Discount percentage element not found in the DOM');
+        }
 }
 
 
@@ -547,6 +569,11 @@ document.querySelector('.remove-coupon-btn').addEventListener('click', function(
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
     });
+     // Reset coupon discount display to zero
+     var couponDiscountElement = document.getElementById('couponDiscount');
+    if (couponDiscountElement) {
+        couponDiscountElement.innerText = '0.00';
+    }
 });
 
 // Function to update total price after applying or removing coupon

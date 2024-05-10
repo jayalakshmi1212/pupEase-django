@@ -65,16 +65,12 @@ def shop(request):
     category_slug = request.GET.get('category')
     brand_name = request.GET.get('brand')
     print(category_slug)
-    if category_slug:
-       products = products.filter(category__slug=category_slug)
-       print(products)
-
-   
-    if brand_name:
-        products = products.filter(brand__brand_name=brand_name)
-
     if category_slug and brand_name:
         products = products.filter(category__slug=category_slug, brand__brand_name=brand_name)
+    elif category_slug:
+        products = products.filter(category__slug=category_slug)
+    elif brand_name:
+        products = products.filter(brand__brand_name=brand_name)
 
     # Sorting functionality
     sort_by = request.GET.get('sort')
@@ -222,7 +218,12 @@ def add_product(request):
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     product_price_puppy = float(product.price_puppy)
-    return render(request, 'product/product_detail.html', {'product': product,'product_price_puppy':product_price_puppy})
+    is_in_wishlist = False
+    
+    if request.user.is_authenticated:
+        # Check if the product is in the wishlist of the current user
+        is_in_wishlist = Wishlist.objects.filter(user=request.user, product=product).exists()
+    return render(request, 'product/product_detail.html', {'product': product,'product_price_puppy':product_price_puppy, 'is_in_wishlist': is_in_wishlist})
 
 
 
@@ -448,7 +449,11 @@ def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'wishlist/wishlist.html', {'wishlist_items': wishlist_items})
 
-
+def remove_from_wishlist_in_product_detail(request, product_id):
+    if request.user.is_authenticated:
+        wishlist_item = get_object_or_404(Wishlist, product_id=product_id, user=request.user)
+        wishlist_item.delete()
+    return redirect(reverse('store:product_detail', kwargs={'pk': product_id}))  # Assuming 'store' is the app namespace
 
 ###################################--------------coupon-------------------##########################################
 from datetime import datetime
@@ -468,7 +473,7 @@ def _cart_id(request):
     return cart
 
 from decimal import Decimal
-def apply_coupon(request):
+def  apply_coupon(request):
     print('apply coupon entry')
     if request.method == 'POST':
         payload = json.loads(request.body)
@@ -502,8 +507,11 @@ def apply_coupon(request):
                 discount_amount = (discount_percentage / 100) * grand_total
                 new_total_price = grand_total - discount_amount
                 new_total_price = float(new_total_price)
+                discount_percentage =float( discount_percentage )
                 request.session['discounted_total'] = new_total_price
-                return JsonResponse({'success': True, 'new_total_price': new_total_price})
+                request.session['discount_percentage'] = discount_percentage
+
+                return JsonResponse({'success': True, 'new_total_price': new_total_price, 'discount_percentage':discount_percentage})
             else:
                 return JsonResponse({'success': False, 'message': 'Coupon is expired'})
         except Coupon.DoesNotExist:

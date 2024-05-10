@@ -52,7 +52,7 @@
                     <tr>
                         <th>Order Number</th>
                         <th>Products</th>
-                        <th>Arriving on</th>
+                        <!-- <th>Arriving on</th> -->
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -74,11 +74,11 @@
                                 {% endfor %}
                             </ul>
                         </td>
-                        <td style="color: red;">
+                        <!-- <td style="color: red;">
                             {% if order.deliverd_at %}
                                 {{ order.deliverd_at }}
                             {% endif %}
-                        </td>
+                        </td> -->
                         <td class="order-actions">
                             <a href="{% url 'order:order_detail' order_number=order.order_number %}">View Details</a>
                         </td>

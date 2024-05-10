@@ -154,7 +154,7 @@ def cart(request):
 
     return render(request, 'carts/cart.html', context)
 
-
+from decimal import Decimal
 @login_required
 def checkout(request):
     print('cart/checkout')
@@ -168,6 +168,7 @@ def checkout(request):
     tax = 0
     grand_total = 0
     selected_address = None
+    
 
 
    
@@ -185,17 +186,19 @@ def checkout(request):
 
         tax = (2 * total) / 100
        
-
+        discount_percentage = request.session.get('discount_percentage', 0)
         discounted_total = request.session.get('discounted_total')
         if discounted_total:
             grand_total = discounted_total
+            discount_amount = discount_percentage 
+            
         else:
             grand_total = total + tax
+            
 
         print('grandtotal:', grand_total)
     except Cart.DoesNotExist:
         pass
-
     if request.method == 'POST':
         print('checkout/post')
         
@@ -240,8 +243,10 @@ def checkout(request):
         'cart_items': cart_items,
         'tax': tax,
         'grand_total': grand_total,
-        'selected_address': selected_address,
+        'discount_percentage': discount_percentage,
     }
+    
+
 
     return render(request, 'carts/checkout.html', context)
 
@@ -276,8 +281,9 @@ def _process_payment(user, order_number, payment_methods_instance, grandtotal):
         return payment1
     else:
         print("cart/_processpayment/cod")
-       
+        
         try:
+           
             print(user)
             payment = Payment.objects.create(
                 payment_method=payment_methods_instance,
@@ -297,4 +303,4 @@ def _process_payment(user, order_number, payment_methods_instance, grandtotal):
             print("kkkkkkkkkkkkkkkkkkkkk")
             return payment_data
         except Exception as e:
-            print("Error occurred:", e)
+            print("Error occurred:", e) 

@@ -15,6 +15,8 @@ urlpatterns=[
     path('change_status/', views.change_order_status, name='change_order_status'),
     path('admin_order_detail/<str:order_number>/',views.admin_order_detail,name='admin_order_detail'),
     path('update_order_status/', views.update_order_status, name='update_order_status'),
+    path('monthly-data/', views.monthly_data_view, name='monthly_data'),
+    path('yearly-data/', views.yearly_data_view, name='yearly_data'),
     
     path('sales-report-pdf/', views.SalesReportPDFView.as_view(), name='sales_report_pdf'),
 

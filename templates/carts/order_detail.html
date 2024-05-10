@@ -35,18 +35,19 @@
                     <div class="col-lg-4 col-md-4">
                         <div class="text-center">
                             <h6 class="mb-1">Deliver to</h6>
-                            <p class="mb-1">
-                                  {% if selected_address %}
-                                <p>{{ selected_address.name }}</p>
-                                <p>{{ selected_address.address_line_1 }}</p>
-                                {% if selected_address.address_line_2 %}
-                                    <p>{{ selected_address.address_line_2 }}</p>
+                            <td colspan="2">
+                                <p class="">{{ order.shipping_address.name }}</p>
+                                <p class="">{{ order.shipping_address.address_line_1}}</p>
+                                {% if order.shipping_address.address_line_2 %}
+                                <p class="">{{ order.shipping_address.address_line_2}}</p>
                                 {% endif %}
-                                <p>{{ selected_address.city }}, {{ selected_address.state }}, {{ selected_address.pincode }}</p>
-                            {% else %}
-                                <p>No address selected</p>
-                            {% endif %}
-                            </p>
+                                <p class="">Phone Number: 91+ {{ order.shipping_address.phone_number }}</p>
+                                <p class="">Pin Code: {{ order.shipping_address.pincode}}</p>
+                                <p class="">{{ order.shipping_address.city }} {{ order.shipping_address.state }} India</p>
+                                {% if order.order_note %}
+                                <strong>Order Note:</strong> {{ order.order_note }}
+                                {% endif %}
+                            </td>
                             <a href="#">View profile</a>
                         </div>
                     </div>

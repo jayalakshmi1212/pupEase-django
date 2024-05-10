@@ -11,6 +11,7 @@ from store.models import Addresses,UserProfile
 from store.models import Product
 from userauths.models import User
 from django.utils.crypto import get_random_string
+from django.conf import settings
 
 # Create your models here.
 class Payment(models.Model):
@@ -31,6 +32,44 @@ class Payment(models.Model):
     def __str__(self):
         return self.payment_id
     
+class Shipping_Addresses(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=30)
+    phone_number = models.CharField(max_length=20)
+    address_line_1 = models.CharField(max_length=50)
+    address_line_2 = models.CharField(max_length=50,blank=True,null=True)
+    city = models.CharField(max_length=50)
+    country = models.CharField(max_length=2)
+    state = models.CharField(max_length=50)
+    pincode = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)    
+    
+    
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            Shipping_Addresses.objects.filter(user = self.user).exclude(pk=self.pk).update(is_default=False)
+        super(Shipping_Addresses, self).save(*args, **kwargs)
+        
+    def get_user_full_address(self):
+        address_parts = f"{self.name}, {self.phone_number}, {self.address_line_1}"
+        
+        if self.address_line_2:
+            address_parts += (', '+self.address_line_2)
+        
+        address_parts += (f", Pin: {self.pincode}, {self.city}, {self.state}, India")
+        
+        
+        return address_parts
+        # return f'{self.name},{self.phone},Pin:{self.pincode},Address:{self.address_line_1},{self.address_line_2},{self.city},{self.state},{self.country}'
+    
+    def __str__(self):
+        return self.name    
+
+
+
 
 class Order(models.Model):
     STATUS = (
@@ -38,6 +77,7 @@ class Order(models.Model):
         ('Accepted', 'Accepted'),
         ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
+        ('failed','failed'),
        
     )
     
@@ -45,6 +85,7 @@ class Order(models.Model):
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True) 
     order_number = models.CharField(max_length=50, unique=True, blank=True)  # Make order_number unique
     address = models.ForeignKey(Addresses, on_delete=models.SET_NULL, null=True, blank=True)
+    shipping_address = models.ForeignKey(Shipping_Addresses,on_delete=models.SET_NULL,unique=False, null= True ,blank=True,related_name = 'order_of_shipping')
     order_note = models.CharField(max_length=50, blank=True)
     order_total = models.FloatField()
     tax = models.FloatField()

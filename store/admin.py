@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib import admin
 from store.models import Category
-from store.models import Product,UserProfile,Brand,Variation
+from store.models import Product,UserProfile,Brand,Variation,Sale
 
 
 class Varitionadmin(admin.ModelAdmin):
@@ -13,6 +13,7 @@ class Varitionadmin(admin.ModelAdmin):
 
 admin.site.register(Category)
 admin.site.register(Product)
+admin.site.register(Sale)
 admin.site.register(UserProfile)
 admin.site.register(Brand)
 admin.site.register(Variation,Varitionadmin)
