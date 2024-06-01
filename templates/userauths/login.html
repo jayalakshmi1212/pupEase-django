@@ -21,10 +21,10 @@
                         <form method="post">
                             {% csrf_token %}
                             <div class="form-group">
-                                <input type="email" required name="email" placeholder="Your Email">
+                                <input type="email" required name="email" id="email" placeholder="Your Email">
                             </div>
                             <div class="form-group">
-                                <input required type="password" name="password" placeholder="Password">
+                                <input required type="password" name="password" id="password" placeholder="Password">
                             </div>
                             <div class="login_footer form-group">
                                 <div class="chek-form">
@@ -46,4 +46,13 @@
         </div>
     </div>
 </section>
+
+<script>
+    // Reset input fields on page load
+    window.onload = function() {
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+    };
+</script>
+
 {% endblock content %}

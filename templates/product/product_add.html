@@ -1,6 +1,6 @@
 {% extends 'partials/adminbase.html' %}
 {% load static %}
-{%  block content %}
+{% block content %}
 <section class="content-main">
     <div class="row">
         <div class="col-lg-9">
@@ -11,8 +11,41 @@
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <div class="form-group">
-                            {{ form.as_p }}
+                        <div class="form-group mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Product Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="{{ form.price.id_for_label }}" class="form-label">Price</label>
+                            {{ form.price }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="{{ form.brand.id_for_label }}" class="form-label">Brand</label>
+                            {{ form.brand }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="{{ form.stock.id_for_label }}" class="form-label">Stock</label>
+                            {{ form.stock }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="{{ form.pro_discount.id_for_label }}" class="form-label">Discount</label>
+                            {{ form.pro_discount }}
+                        </div>
+                        <div class="form-group form-check mb-3">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Is Active</label>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Product Image</label>
+                            {{ form.image }}
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </form>

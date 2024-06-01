@@ -6,31 +6,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Invoice</title>
-    <!-- Add any necessary CSS styles here -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #000; /* Brighter text */
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1, h2, h5 {
+            color: #0056b3;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .info-box {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #f2f2f2;
+        }
+        .info-box > div {
+            flex: 1;
+            margin: 0 10px;
+        }
+        .text-muted {
+            color: #333; /* Brighter text */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            color: #000; /* Brighter text */
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #000; /* Brighter text */
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .card-body {
+            padding: 15px;
+            color: #000; /* Brighter text */
+        }
+        .list-group-item {
+            border: none;
+            padding: 10px 0;
+            color: #000; /* Brighter text */
+        }
+        .card-footer {
+            background-color: #f8f9fa;
+            padding: 10px;
+            text-align: right;
+            color: #000; /* Brighter text */
+        }
+        .mb-1 {
+            margin-bottom: .25rem;
+        }
+        .mb-15 {
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-4 col-md-4 mb-lg-0 mb-15">
-                <span>
-                    <i class="material-icons md-calendar_today"></i> Order DATE:
-                    <b>{{ order.created_at }}</b>
-                </span> <br>
-                <small class="text-muted">Order ID: {{ order.order_number}}</small>
+        <div class="header">
+            <img src="your_logo_url_here" alt="Company Logo">
+            <h1>Order Invoice</h1>
+        </div>
+        <div class="info-box">
+            <div>
+                <h6 class="mb-1">Customer</h6>
+                <small class="text-muted">Name: {{ order.user.username }}</small><br>
+                <small class="text-muted">Mobile: {{ order.user.phone_number }}</small><br>
             </div>
-            <div class="col-lg-4 col-md-4">
-                <div class="text">
-                    <h6 class="mb-1">Customer</h6>
-                    <small class="text-muted">CUSTOMER NAME: {{ order.user.username }}</small><br>
-                    <small class="text-muted">CUSTOMER MOBILE: {{ order.user.phone_number }}</small><br>
-                  
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-4">
-                <div class="text-center">
-                    <h6 class="mb-1">Deliver to</h6>
-                    <p class="mb-1">
-                          {% if selected_address %}
+            <div>
+                <h6 class="mb-1">Deliver to</h6>
+                <div class="text-muted">
+                    {% if selected_address %}
                         <p>{{ selected_address.name }}</p>
                         <p>{{ selected_address.address_line_1 }}</p>
                         {% if selected_address.address_line_2 %}
@@ -40,55 +117,67 @@
                     {% else %}
                         <p>No address selected</p>
                     {% endif %}
-                    </p>
-                   
                 </div>
             </div>
         </div>
+
+       
+
+        <h2>Ordered Products</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order_product in order.orderproduct_set.all %}
+                <tr>
+                    <td>{{ order_product.product.name }}</td>
+                    <td>{{ order_product.quantity }}</td>
+                    <td>{{ order_product.total_price }}</td>
+                    <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};">
+                        {{ order.status }}
+                    </td>
+                    <td>{{ payment_method }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Payment Summary</h5>
+                <ul class="list-group list-group-flush">
+                    {% for order_product in order.orderproduct_set.all %}
+                    <li class="list-group-item">
+                        <strong>Payment method:</strong> {{ payment_method }}<br>
+                        <strong>Product Price:</strong> {{ order_product.product_price }}<br>
+                        <strong>Payment Status:</strong> {{ order.status }}<br>
+                        <div class="card-footer text-muted">
+                            <strong>Total Amount:</strong> {{ order_product.total_price }}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="info-box">
+            <div>
+                <h1>Order Invoice</h1>
+                <p>Order Number: {{ order.order_number }}</p>
+                <p>Order Date: {{ order.created_at }}</p>
+                <p>Customer Name: {{ order.user.username }}</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for your purchase!</p>
+        </div>
     </div>
-    <h1>Order Invoice</h1>
-    <p>Order Number: {{ order.order_number }}</p>
-    <p>Order Date: {{ order.created_at }}</p>
-    <p>Customer Name: {{ order.user.username }}</p>
-    <!-- Add more details about the order as needed -->
-
-    <h2>Ordered Products</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Payment</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order_product in order.orderproduct_set.all %}
-            <tr>
-                <td>{{ order_product.product.name }}</td>
-                <td>{{ order_product.quantity }}</td>
-                <td>{{ order_product.product_price }}</td>
-                <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};" >{{ order.status }} </td>
-
-                <td>{{order.payment.payment_method}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div class="container mt-4">
-        {% for order_product in order.orderproduct_set.all %}
-        <h5>Payment Summary</h5>
-        <ul>
-            <li>Payment Method: {{order.payment.payment_method}}</li>
-            <li>Total Amount: {{ order_product.product_price }}</li>
-            <li>payment status:{{ order.status }}</li>
-            <!-- Add more payment-related fields as needed -->
-        </ul>
-        {% endfor %}
-    </div>
-
-    <!-- Add any additional sections or information about the order -->
-
 </body>
 </html>

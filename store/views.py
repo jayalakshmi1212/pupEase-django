@@ -3,7 +3,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from store.models import Category
 from django.views.generic import ListView
 from store.forms import CategoryForm
-from store.models import Product,Discount
+from store.models import Product,Discount,Variation
 from carts.models import Cartitem
 from store.forms import ProductForm
 from django.urls import reverse
@@ -32,9 +32,9 @@ from django.db.models.functions import Lower
 
 @never_cache
 def index(request):
-    if request.user.is_authenticated:
-        if request.user.is_superuser:
-            return redirect("adminp:admin_home")
+    # if request.user.is_authenticated:
+    #     if request.user.is_superuser:
+    #         return redirect("adminp:admin_home")
     products = Product.objects.filter(is_active=True)  # Query the Product model
     paginator=Paginator(products,3)
     page=request.GET.get('page')
@@ -106,6 +106,9 @@ def shop(request):
 
 def about(request):
     return render(request,"store/about.html")
+
+def contact(request):
+    return render(request,"store/contact.html")
 
 #________________________category_management___________________________________________
 #_____________________________________________________________________________________
@@ -217,14 +220,12 @@ def add_product(request):
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    product_price_puppy = float(product.price_puppy)
     is_in_wishlist = False
     
     if request.user.is_authenticated:
         # Check if the product is in the wishlist of the current user
         is_in_wishlist = Wishlist.objects.filter(user=request.user, product=product).exists()
-    return render(request, 'product/product_detail.html', {'product': product,'product_price_puppy':product_price_puppy, 'is_in_wishlist': is_in_wishlist})
-
+    return render(request, 'product/product_detail.html', {'product': product, 'is_in_wishlist': is_in_wishlist})
 
 
 
@@ -428,7 +429,7 @@ def shop_new_arrivals(request):
 
 # ----------------------------------------wishlist--------------------------------------------------------?
 
-
+@login_required(login_url='userauths:loginpage')
 def add_to_wishlist(request, product_id):
     if request.user.is_authenticated:
         product = get_object_or_404(Product, pk=product_id)
@@ -444,7 +445,7 @@ def remove_from_wishlist(request, product_id):
         wishlist_item = get_object_or_404(Wishlist, product_id=product_id, user=request.user)
         wishlist_item.delete()
     return redirect('store:wishlist')  # Assuming 'store' is the app namespace
-@login_required
+@login_required(login_url='userauths:loginpage')
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'wishlist/wishlist.html', {'wishlist_items': wishlist_items})

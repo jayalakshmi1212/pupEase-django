@@ -18,6 +18,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth.models import User as customuser
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
+from order.models import Wallet
 
 
 
@@ -26,11 +27,10 @@ User=settings.AUTH_USER_MODEL
 def printlogin(request):
     print("jaya")
     if request.user.is_authenticated:
-        if request.user.is_superuser:
-            return redirect("adminp:admin_home")
-        else:
-            print("jaya super")
-            return redirect("store:index")
+        return redirect("store:index")
+    # else:
+    #     print("jaya super")
+    #     return redirect("store:index")
     
     if request.method=='POST':
         print("jaya double super")
@@ -45,7 +45,7 @@ def printlogin(request):
 
         if user is not None:
             login(request,user)
-            messages.success(request,"you are logged in.")
+            
             return redirect('store:index')
         else:
             messages.warning(request,"User does not exist,create an account.")   
@@ -58,6 +58,11 @@ def printsignup(request):
     if request.method == 'POST':
         form = Usersignup(request.POST)
         if form.is_valid():
+            new_user = form.save()  # Save the user
+            
+            # Create a wallet for the new user
+            Wallet.objects.create(user=new_user, balance=0.0)
+            
             email = form.cleaned_data['email']
             phone_number = form.cleaned_data['phone_number']
             new_user = form.save()

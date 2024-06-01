@@ -1,4 +1,4 @@
-{% extends 'partials/base.html'%}
+{% extends 'partials/base.html' %}
 {% load static %}
 {% block content %}
 
@@ -25,6 +25,7 @@
                                             <th scope="col" colspan="2">Product</th>
                                             <th scope="col">Price</th>
                                             <th scope="col">Stock Status</th>
+                                            <th scope="col">Add to Cart</th>
                                             <th scope="col">Remove</th>
                                         </tr>
                                     </thead>
@@ -37,6 +38,13 @@
                                             </td>
                                             <td class="price" data-title="Price"><span>{{ item.product.price }}</span></td>
                                             <td>{% if item.product.stock > 0 %} In Stock {% else %} Out of Stock {% endif %}</td> 
+                                            <td class="action" data-title="Add to Cart">
+                                                <!-- Form to add the product to the cart -->
+                                                <form action="" method="post">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-primary">Add to Cart</button>
+                                                </form>
+                                            </td>
                                             <td class="action" data-title="Remove">
                                                 <!-- Link to remove the product from the wishlist -->
                                                 <a href="{% url 'store:remove_from_wishlist' product_id=item.product.id %}" class="text-muted"><i class="fi-rs-trash"></i></a>
@@ -46,9 +54,9 @@
                                     </tbody>
                                 </table>
                             {% else %}
-                                <p style="text-danger">No items in wishlist.</p>
+                                <p class="text-danger">No items in wishlist.</p>
                                 <div class="text-center">
-                                    <a href="{% url 'store:index'%}" class="btn btn-primary">Continue Shopping</a>
+                                    <a href="{% url 'store:index' %}" class="btn btn-primary">Continue Shopping</a>
                                 </div>
                             {% endif %}
                         </div>

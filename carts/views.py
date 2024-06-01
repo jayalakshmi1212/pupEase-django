@@ -25,7 +25,7 @@ def _cart_id(request):
     return cart
 
 # View to add a product to the cart
-@login_required
+@login_required(login_url='userauths:loginpage')
 def add_cart(request, product_id):
     product = Product.objects.get(id=product_id)
     user = request.user
@@ -56,7 +56,9 @@ def add_cart(request, product_id):
 
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
+        print("llllllllllllll")
     except Cart.DoesNotExist:
+        print("koom")
         cart = Cart.objects.create(cart_id=_cart_id(request))
 
     try:
@@ -122,6 +124,7 @@ def remove_cart_item(request, product_id):
     return redirect('cart:cart')
 
 # View to display the cart
+@login_required(login_url='userauths:loginpage')
 def cart(request):
     total = 0
     quantity = 0
@@ -231,7 +234,7 @@ def checkout(request):
         draft_order.payment = Payment.objects.get(payment_order_id=payment['payment_order_id'])
         draft_order.save()
         print("draft_order",draft_order)
-
+     
         return JsonResponse({'message': 'Success', 'context': payment})
             
 
@@ -250,7 +253,12 @@ def checkout(request):
 
     return render(request, 'carts/checkout.html', context)
 
+def cart_count(request):
+    # Logic to fetch the cart count (replace with your actual logic)
+    cart_count = Cart.objects.filter(user=request.user).count()
 
+    # Return the count in a JSON response
+    return JsonResponse({'cart_count': cart_count})
 
 def _process_payment(user, order_number, payment_methods_instance, grandtotal):
     payment = None
@@ -294,9 +302,11 @@ def _process_payment(user, order_number, payment_methods_instance, grandtotal):
                 user = user
             )
             print("uuuuuuuuuuuuuuu")
+            print('payment_method_instance:',payment_methods_instance)
             payment_data = {
                 'payment_id': payment.id,
                 'payment_order_id': payment.payment_order_id,
+                
             }
             print("kkkkkkkkkkkkkkkkkkkkk")
             print(payment)

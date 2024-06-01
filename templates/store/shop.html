@@ -84,16 +84,16 @@
                                         <a href="">{{ product.category }}</a>
                                     </div>
                                     <h2><a href="">{{ product.name }}</a></h2>
-                                    <div class="rating-result" title="90%">
+                                    <div class="rating-result" title="{{ product.discount_percentage }}%">
                                         <span>
-                                            <span>90%</span>
+                                            <span>{{ product.discount_percentage }}%</span> <!-- Display the actual discount percentage -->
                                         </span>
                                     </div>
                                     <div class="product-price">
                                         {% if product.discounted_price != product.price %}
                                         <span>₹{{ product.discounted_price }}</span>
                                         <span class="old-price">₹{{ product.price }}</span>
-                                        <span class="discount">-{{ product.discount_percentage }}%</span> <!-- Display discount percentage -->
+                                        <!-- <span class="discount">-{{ product.discount_percentage }}%</span> Display discount percentage -->
                                         {% else %}
                                         <span>₹{{ product.price }}</span>
                                         {% endif %}

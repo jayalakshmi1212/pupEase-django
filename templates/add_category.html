@@ -1,16 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Category</title>
-</head>
-<body>
-    <h1>Add Category</h1>
-    <form method="post"enctype="multipart/form-data>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
-</body>
-</html>
+{% extends 'partials/adminbase.html' %}
+{% load static %}
+
+{% block content %}
+<section class="content-main">
+    <div class="row">
+        <div class="col-12">
+            <div class="content-header d-flex justify-content-between align-items-center">
+                <h2 class="content-title">Edit Category</h2>
+                <div>
+                    <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                    <button class="btn btn-md rounded font-sm hover-up">Publish</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Basic Information</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row mb-4">
+                            <div class="col-lg-6">
+                                <label for="category_name" class="form-label">{{ form.category_name.label }}</label>
+                                {{ form.category_name }}
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="description" class="form-label">{{ form.description.label }}</label>
+                                {{ form.description }}
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-lg-6 form-check">
+                                {{ form.is_active }}
+                                <label for="is_active" class="form-check-label">{{ form.is_active.label }}</label>
+                            </div>
+                            <div class="col-lg-6 form-check">
+                                <input type="checkbox" class="form-check-input" id="toggleCatDiscount">
+                                <label for="toggleCatDiscount" class="form-check-label">Apply Category Offer</label>
+                            </div>
+                        </div>
+                        <div class="row mb-4" id="catDiscountRow" style="display: none;">
+                            <div class="col-lg-6">
+                                <label for="cat_discount" class="form-label">{{ form.cat_discount.label }}</label>
+                                {{ form.cat_discount }}
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="image" class="form-label">{{ form.image.label }}</label>
+                            {{ form.image }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div> <!-- card end// -->
+        </div>
+    </div>
+</section> <!-- content-main end// -->
+<style>
+    .content-header {
+        margin-bottom: 20px;
+    }
+    .content-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+    .btn-light {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .card {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+    .form-check-input {
+        margin-right: 10px;
+    }
+</style>
+<script>
+    // Add an event listener to detect changes in the checkbox
+    document.getElementById('toggleCatDiscount').addEventListener('change', function () {
+        // Get the catDiscountRow element
+        var catDiscountRow = document.getElementById('catDiscountRow');
+
+        // Toggle its visibility based on the checkbox state
+        catDiscountRow.style.display = this.checked ? 'flex' : 'none';
+    });
+</script>
+{% endblock content %}

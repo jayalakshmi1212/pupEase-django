@@ -179,7 +179,10 @@ def adminhome(request):
     # Calculate monthly revenue
     current_month = timezone.now().month
     monthly_payments = payments.filter(created_at__month=current_month)
-    monthly_revenue = monthly_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+    if monthly_payments:
+       monthly_revenue = monthly_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+    else:
+        monthly_revenue=0
     
 
     

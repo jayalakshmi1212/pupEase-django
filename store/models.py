@@ -19,6 +19,8 @@ class Category(models.Model):
     is_active = models.BooleanField(default=True)
     description = models.TextField(blank=True, null=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
+    # abc = models.CharField(max_length=200, null=True, blank=True)
+
    
 
     def save(self, *args, **kwargs):
@@ -136,7 +138,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile",default=None)
     username = models.CharField(max_length=30,null = True)
     email=models.EmailField(max_length=100,null=False)
-    phone_number = models.IntegerField(null=True)
+    phone_number = models.CharField(null=True)
    
     def __str__(self):
         return self.user.username

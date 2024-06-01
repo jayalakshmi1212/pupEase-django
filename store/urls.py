@@ -11,6 +11,7 @@ urlpatterns=[
     path("",views.index,name='index'),
     path("shop/",views.shop,name='shop'),
     path("about/",views.about,name='about'),
+    path("contact/",views.contact,name='contact'),
 
     #category
     path('categories/', views.CategoryListView.as_view(), name='category_list'),
@@ -25,7 +26,7 @@ urlpatterns=[
     path('product/<int:pk>/delete/', views.product_delete, name='product_delete'),
     path('add_product/', views.add_product, name='product_add'),
     path('product/<int:pk>/', views.product_detail, name='product_detail'),
-
+   
     #user profile
     path('myaccountmanager/',views.myaccountmanager,name='my_account_manager'),
     path('accountdetails/',views.accountdetails,name='account_details'),

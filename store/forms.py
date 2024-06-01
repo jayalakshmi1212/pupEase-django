@@ -15,12 +15,28 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['category_name', 'description', 'is_active', 'image', 'cat_discount']
-
+        widgets = {
+            'category_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'cat_discount': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'category', 'price','price_puppy','brand', 'stock', 'image','is_active','description','pro_discount']
-
+        fields = ['name', 'category', 'price',  'brand', 'stock', 'image', 'is_active', 'description', 'pro_discount']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter product name'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter price'}),
+             'brand': forms.Select(attrs={'class': 'form-select'}),
+            'stock': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter stock quantity'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter product description'}),
+            'pro_discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter discount'}),
+        }
 
 class UserProfileForm(forms.ModelForm):
     class Meta:

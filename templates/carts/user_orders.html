@@ -74,11 +74,9 @@
                                 {% endfor %}
                             </ul>
                         </td>
-                        <!-- <td style="color: red;">
-                            {% if order.deliverd_at %}
-                                {{ order.deliverd_at }}
-                            {% endif %}
-                        </td> -->
+                        <!-- <td style="color: rgb(0, 63, 11);"> <!-- Ensure that the styling is not hiding the text -->
+                            <!-- {{ order.status }}
+                        </td> --> -->
                         <td class="order-actions">
                             <a href="{% url 'order:order_detail' order_number=order.order_number %}">View Details</a>
                         </td>

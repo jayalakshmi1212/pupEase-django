@@ -1,0 +1,18 @@
+<!-- add_variant.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Variant</title>
+</head>
+<body>
+    <h2>Add Variant for {{ product.name }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Variant</button>
+    </form>
+</body>
+</html>

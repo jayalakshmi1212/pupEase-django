@@ -27,10 +27,10 @@
                             <div class="form-group">
                                 <label for="statusSelect">Change Status:</label>
                                 <select class="form-select" id="statusSelect" name="status">
-                                    <option value="Awaiting payment" {% if order.status == "Awaiting payment" %} selected {% endif %}>Awaiting payment</option>
                                     <option value="Confirmed" {% if order.status == "Confirmed" %} selected {% endif %}>Confirmed</option>
                                     <option value="Shipped" {% if order.status == "Shipped" %} selected {% endif %}>Shipped</option>
                                     <option value="Delivered" {% if order.status == "Delivered" %} selected {% endif %}>Delivered</option>
+                                    <option value="Awaiting payment" {% if order.status == "Awaiting payment" %} selected {% endif %}>Awaiting payment</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary">Save</button>
@@ -121,36 +121,37 @@
                                             </td>
                                             <td>{{ order_product.product_price }}</td>
                                             <td> {{ order_product.quantity }} </td>
-                                            <td class="text-end"> {{ total_amount  }}</td>
+                                            <td class="text-end"> {{ order_product.total_price }}</td>
                                         </tr>
                                         {% endfor %}
                                         
                                         
-                                       
+                                        {% for order_product in order.orderproduct_set.all %}
                                         <tr>
                                             <td colspan="4">
                                                 <article class="float-end">
                                                     <dl class="dlist">
                                                         <dt>Subtotal:</dt>
-                                                        <dd>$973.35</dd>
+                                                        <dd>{{order_product.product_price}} </dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Shipping cost:</dt>
-                                                        <dd>$10.00</dd>
+                                                        <dd>0</dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Grand total:</dt>
-                                                        <dd> <b class="h5">$983.00</b> </dd>
+                                                        <dd> <b class="h5">{{ order_product.total_price }}</b> </dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>
                                                         <dd>
-                                                            <span class="badge rounded-pill alert-success text-success">Payment done</span>
+                                                            <span class="badge rounded-pill alert-success text-success">{{order.payment.status}}</span>
                                                         </dd>
                                                     </dl>
                                                 </article>
                                             </td>
                                         </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div> <!-- table-responsive// -->
@@ -162,20 +163,7 @@
             </div> <!-- card end// -->
             
         </section> <!-- content-main end// -->
-        <footer class="main-footer font-xs">
-            <div class="row pb-30 pt-15">
-                <div class="col-sm-6">
-                    <script data-cfasync="false" src="{% static '../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js' %}"></script><script>
-                    document.write(new Date().getFullYear())
-                    </script> ©, Evara - HTML Ecommerce Template .
-                </div>
-                <div class="col-sm-6">
-                    <div class="text-sm-end">
-                        All rights reserved
-                    </div>
-                </div>
-            </div>
-        </footer>
+        
     </main>
     <script src="{% static 'assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'assets/js/vendors/bootstrap.bundle.min.js' %}"></script>

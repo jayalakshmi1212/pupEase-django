@@ -153,10 +153,10 @@ class OrderProduct(models.Model):
                 product.save()
         super().save(*args, **kwargs)
 
-    def total(self):
-       return self.product_price * self.quantity
-
-
+     
+    def total_price(self):
+        return self.quantity * self.product_price
+    
 class Wallet(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     balance = models.IntegerField(default=0)

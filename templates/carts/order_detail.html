@@ -87,10 +87,10 @@
                                             </td>
                                             <td>{{ order_product.product.name }}</td>
                                             <td>{{ order_product.quantity }}</td>
-                                            <td>{{ order_product.product_price }}</td>
+                                            <td>{{ order_product.total_price }}</td>
                                             <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};" >{{ order.status }} </td>
 
-                                            <td>{{order.payment.payment_method}}</td>
+                                            <td>{{payment_method}}</td>
                                             <td><a href="#" id="cancelOrderBtn">Cancel</a></td>
                                         </tr>
                                     {% endfor %}
@@ -123,16 +123,26 @@
     </div>
 </div>
 <div class="container mt-4">
-    {% for order_product in order.orderproduct_set.all %}
-    <h5>Payment Summary</h5>
-    <ul>
-        <li>Payment Method: {{order.payment.payment_method}}</li>
-        <li>Total Amount: {{ order_product.product_price }}</li>
-        <li>payment status:{{ order.status }}</li>
-        <!-- Add more payment-related fields as needed -->
-    </ul>
-    {% endfor %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Payment Summary</h5>
+            <ul class="list-group list-group-flush">
+                {% for order_product in order.orderproduct_set.all %}
+                <li class="list-group-item">
+                    <strong>Payment method:</strong> {{ payment_method}}<br>
+                    <strong>Product Price:</strong> {{ order_product.product_price }}<br>
+                    <strong>Payment Status:</strong> {{ order.status }}<br>
+                    <div class="card-footer text-muted">
+                        <strong>Total Amount:</strong> {{ order_product.total_price }}
+                    </div>
+                    <!-- Add more payment-related fields as needed -->
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
+
 <script>
     // Function to handle cancel/return button behavior
     function handleCancelReturnButton(orderStatus) {

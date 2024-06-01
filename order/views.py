@@ -38,86 +38,14 @@ def _cart_id(request):
     if not cart:
         cart = request.session.create()
     return cart
-# def place_order(request):
-#     print('order/place_order')
-#     current_user = request.user
-#     cart_items = Cartitem.objects.filter(user=current_user)
-#     cart_count = cart_items.count()
-    
-#     if cart_count <= 0:
-#         return redirect('store:index')
-    
-#     total = 0
-#     for cart_item in cart_items:
-#         total += (cart_item.product.price * cart_item.quantity)
-    
-#     tax = (2 * total) / 100
-#     grand_total = total + tax
-     
-#     client = razorpay.Client(auth=(settings.RAZOR_PAY_KEY_ID, settings.KEY_SECRET))
-#     amount = int(grand_total * 100)
-#     payment = client.order.create({'amount': amount, 'currency':'INR','payment_capture':1})
-    
 
-#     if request.method == 'POST':
-#         form = AddressForm(request.POST)
-#         if form.is_valid():
-#             address = form.save(commit=False)
-#             address.user = current_user
-#             address.save()
-
-#             # Check if user has selected an address
-#             if not current_user.profile.selected_address:
-#                 messages.error(request, "Please select an address before placing the order.")
-#                 return redirect('cart:checkout')  # Adjust the URL name according to your project
-
-#             # Generate unique order number
-#             order_number = get_random_string(length=10)  # Example: Generate a random string of length 10
-#             print(order_number)
-
-#             order = Order.objects.create(
-#                 user=current_user,
-#                 order_number=order_number,  # Assign the generated order number
-#                 address=address,
-#                 order_note=request.POST.get('order_note', ''),
-#                 order_total=grand_total,
-#                 tax=tax,
-#                 ip=request.META.get('REMOTE_ADDR'),
-#                 deliverd_at=timezone.now() + timezone.timedelta(days=5)
-#             )
-
-#             for cart_item in cart_items:
-#                 OrderProduct.objects.create(
-#                     order=order,
-#                     user=current_user,
-#                     product=cart_item.product,
-#                     quantity=cart_item.quantity,
-#                     product_price=cart_item.product.price,
-#                     ordered=True
-#                 )
-
-#             # Set session variable to indicate order has been placed
-#             request.session['order_placed'] = True
-
-#             context = {
-#                 'order': order,
-#                 'cart_items': cart_items,
-#                 'total': total,
-#                 'tax': tax,
-#                 'grand_total': grand_total,
-#                 'payment_method': 'Cash on Delivery',
-#                 'payment':payment,
-#             }
-#             return render(request, 'carts/payment.html', context)
-#     else:
-#         form = AddressForm()
-   
-#     return render(request, 'carts/delivery-address.html', {'form': form})
 from django.utils import timezone
 from datetime import timedelta
 from django.http import HttpResponse  # Import HttpResponse module
 from django.shortcuts import get_object_or_404
-def payment(request):
+
+
+def payment(request): #this is order success page
 
     print("order/payment entry")
     
@@ -191,6 +119,8 @@ def payment(request):
 )
     order.shipping_address = shipping_address
     order.save()
+    payment_method = order.payment.payment_method if order.payment else "COD"
+    print(payment_method)
     
     context = {
         'order': order,
@@ -198,8 +128,9 @@ def payment(request):
         'tax': tax,
         'grand_total': grand_total,
         'selected_address': order.address,
+        'payment_method': payment_method,
+
     }
-        
     return render(request, 'carts/payment.html', context)
 
 
@@ -271,7 +202,7 @@ def user_orders(request):
             'tax': order.tax,
             'status': order.status,
             'created_at': order.created_at,
-            'deliverd_at': order.deliverd_at,
+            'deliverd_at': order.deliverd_at, 
             'selected_address': order.address,
             'products_info': products_info,
         })
@@ -284,18 +215,20 @@ def order_detail(request, order_number):
     print('order/order_det')
     order = get_object_or_404(Order, order_number=order_number)
     selected_address = order.address  # Assigning order.address to selected_address
-    
+    payment_method = order.payment.payment_method if order.payment else "COD"
+    print(payment_method)
     if order.payment and order.payment.status == 'failed':
         order.status = 'failed'
         order.save()
 
     # Fetching related order products
     order_products = order.orderproduct_set.all()
-
+    
     context = {
         'order': order,
         'selected_address': selected_address,
         'order_products': order_products,  # Passing order products to the template
+        'payment_method': payment_method ,
     }
     return render(request, 'carts/order_detail.html', context)
 
@@ -327,11 +260,13 @@ def generate_pdf(request, order_number):
     # Retrieve the order object using the order number
     order = get_object_or_404(Order, order_number=order_number)
     selected_address = order.address  # Assigning order.address to selected_address
+    payment_method = order.payment.payment_method if order.payment else "COD"
 
     # Render the HTML template with order details
     template_path = 'carts/invoice_template.html'
     context = {'order': order,
                 'selected_address': selected_address,
+                'payment_method':payment_method
                 }
     template = get_template(template_path)
     html = template.render(context)
