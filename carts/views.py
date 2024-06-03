@@ -158,6 +158,7 @@ def cart(request):
     return render(request, 'carts/cart.html', context)
 
 from decimal import Decimal
+from store.models import Coupon
 @login_required
 def checkout(request):
     print('cart/checkout')

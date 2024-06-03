@@ -51,6 +51,7 @@ urlpatterns=[
     path('add_to_wishlist/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('remove_from_wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('remove_from_wishlist_in_product_detail/<int:product_id>/',views.remove_from_wishlist_in_product_detail,name='remove_from_wishlist_in_product_detail'),
+    path('wishlist/add_to_cart/<int:product_id>/',views.add_to_cart_from_wishlist, name='add_to_cart_from_wishlist'),
 
     #wallet
     path('wallet/',walletviews, name='wallet'),

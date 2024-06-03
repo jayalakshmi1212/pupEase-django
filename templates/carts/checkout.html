@@ -209,27 +209,30 @@
                         </div>
                         <br>
                         
-                        <!-- Button to open the coupon modal -->
-                    <button id="couponBtn" class="btn btn-primary">Apply Coupon</button>
-
-                    <!-- Modal -->
-                    <div id="couponModal" class="modal">
-                                            <!-- Your HTML template -->
-                    
-                    <!-- Modal content -->
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>Apply Coupon</h2>
-                        <form id="couponForm">
-                        <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code">
-                        <button type="submit">Apply</button>
-                        </form>
+                   
+                        <!-- Coupon Section -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <button id="couponBtn" class="btn btn-primary w-100">Apply Coupon</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-danger w-100 remove-coupon-btn" data-coupon-id="{{ coupon.id }}">Remove Coupon</button>
+                            </div>
+                        </div>
+                        <br>
                         
-                    </div>
-
-                    </div>
-                    <button class="btn btn-sm remove-coupon-btn" data-coupon-id="{{ coupon.id }}">Remove Coupon</button>
-
+                        <!-- Modal -->
+                        <div id="couponModal" class="modal">
+                            <!-- Modal content -->
+                            <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <h2>Apply Coupon</h2>
+                                <form id="couponForm">
+                                    <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code" class="form-control mb-3">
+                                    <button type="submit" class="btn btn-success">Apply</button>
+                                </form>
+                            </div>
+                        </div>
 
                         <br>
                         <!-- Payment Method -->

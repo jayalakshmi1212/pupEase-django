@@ -40,7 +40,7 @@
                                             <td>{% if item.product.stock > 0 %} In Stock {% else %} Out of Stock {% endif %}</td> 
                                             <td class="action" data-title="Add to Cart">
                                                 <!-- Form to add the product to the cart -->
-                                                <form action="" method="post">
+                                                <form action="{% url 'store:add_to_cart_from_wishlist' item.product.id %}" method="post">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-primary">Add to Cart</button>
                                                 </form>

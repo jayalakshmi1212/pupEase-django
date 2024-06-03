@@ -165,7 +165,8 @@ def update_order_status(request):
 
 
 ##############################################
-
+from django.db.models.functions import Cast
+from django.db.models import Sum, FloatField
 def adminhome(request):
     Products = Product.objects.all()
     orders = Order.objects.filter(is_ordered=True)
@@ -173,14 +174,22 @@ def adminhome(request):
     brands = Brand.objects.all()
     payments = Payment.objects.filter(status='SUCCESS')
     
+    for payment in payments:
+        print(f"Payment ID: {payment.id}, Amount Paid: {payment.amount_paid}, Created At: {payment.created_at}")
+
     # Calculate total revenue
-    revenue = sum(float(payment.amount_paid) for payment in payments)
+    payments_with_numeric_amount = payments.annotate(numeric_amount_paid=Cast('amount_paid', FloatField()))
+    for payment in payments_with_numeric_amount:
+        print(f"Annotated Payment ID: {payment.id}, Numeric Amount Paid: {payment.numeric_amount_paid}")
+
+    revenue =  payments_with_numeric_amount.aggregate(total=Sum('numeric_amount_paid'))['total'] or 0
+    print(revenue)
 
     # Calculate monthly revenue
     current_month = timezone.now().month
-    monthly_payments = payments.filter(created_at__month=current_month)
+    monthly_payments = payments_with_numeric_amount.filter(created_at__month=current_month)
     if monthly_payments:
-       monthly_revenue = monthly_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+       monthly_revenue = monthly_payments.aggregate(total=Sum('numeric_amount_paid'))['total'] or 0
     else:
         monthly_revenue=0
     

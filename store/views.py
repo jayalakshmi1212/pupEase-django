@@ -428,7 +428,7 @@ def shop_new_arrivals(request):
     return render(request, 'store/shop.html', context)
 
 # ----------------------------------------wishlist--------------------------------------------------------?
-
+import uuid
 @login_required(login_url='userauths:loginpage')
 def add_to_wishlist(request, product_id):
     if request.user.is_authenticated:
@@ -456,6 +456,16 @@ def remove_from_wishlist_in_product_detail(request, product_id):
         wishlist_item.delete()
     return redirect(reverse('store:product_detail', kwargs={'pk': product_id}))  # Assuming 'store' is the app namespace
 
+from carts.views import add_cart
+@login_required
+def add_to_cart_from_wishlist(request, product_id):
+    # Call the existing add_to_cart function
+    response = add_cart(request, product_id)
+
+    # Remove the item from the wishlist
+    Wishlist.objects.filter(user=request.user, product_id=product_id).delete()
+
+    return response
 ###################################--------------coupon-------------------##########################################
 from datetime import datetime
 # views.py
@@ -510,9 +520,8 @@ def  apply_coupon(request):
                 new_total_price = float(new_total_price)
                 discount_percentage =float( discount_percentage )
                 request.session['discounted_total'] = new_total_price
-                request.session['discount_percentage'] = discount_percentage
-
-                return JsonResponse({'success': True, 'new_total_price': new_total_price, 'discount_percentage':discount_percentage})
+                request.session['discount_percentage'] = float(discount_percentage)
+                return JsonResponse({'success': True, 'new_total_price': new_total_price, 'discount_percentage': float(discount_percentage)})
             else:
                 return JsonResponse({'success': False, 'message': 'Coupon is expired'})
         except Coupon.DoesNotExist:
