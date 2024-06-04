@@ -101,7 +101,7 @@ def printsignup(request):
 
 def printlogout(request):
     if request.user.is_authenticated:
-        logout(request) 
+        logout(request, request.user) 
     return redirect('userauths:loginpage')
 
 
