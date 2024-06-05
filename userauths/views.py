@@ -25,7 +25,7 @@ from order.models import Wallet
 User=settings.AUTH_USER_MODEL
 @never_cache
 def printlogin(request):
-    print("jaya")
+    
     if request.user.is_authenticated:
         return redirect("store:index")
     # else:
@@ -33,7 +33,7 @@ def printlogin(request):
     #     return redirect("store:index")
     
     if request.method=='POST':
-        print("jaya double super")
+        
         email=request.POST.get('email')
         password=request.POST.get('password')
 
@@ -58,6 +58,10 @@ def printsignup(request):
     if request.method == 'POST':
         form = Usersignup(request.POST)
         if form.is_valid():
+            phone_number = form.cleaned_data['phone_number']
+            if len(phone_number) != 10 or not phone_number.isdigit():
+                form.add_error('phone_number', 'Phone number must be exactly 10 digits and contain only digits.')
+                return render(request, 'userauths/signup.html', {'form': form})
             new_user = form.save()  # Save the user
             
             # Create a wallet for the new user
@@ -178,7 +182,7 @@ def resetpassword_validation(request, uidb64, token):
         messages.error(request, 'Sorry, the activation link has expired.!')
         return redirect('userauths:loginpage')
 
-
+from django.contrib.auth.hashers import check_password
 def reset_password(request):
     if request.method == 'POST':
         password = request.POST.get('password')
@@ -187,6 +191,11 @@ def reset_password(request):
         if password == confirm_password:
             uid = request.session.get('uid')
             user = User.objects.get(pk=uid)
+            # Check if the new password is the same as the current password
+            if check_password(password, user.password):
+                messages.error(request, "You cannot use your current password. Please choose a new password.")
+                return redirect('userauths:reset_password')  # Redirect back to the reset password page
+
             user.set_password(password)
             user.save()
             messages.success(request, "Password successfully reset.")

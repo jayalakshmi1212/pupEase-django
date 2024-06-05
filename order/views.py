@@ -163,7 +163,7 @@ def user_orders(request):
     user = request.user
     orders = Order.objects.filter(
         user=user,
-        status__in=['New', 'confirmed', 'failed']  # Include orders with status "New", "confirmed", or "failed"
+        status__in=['New', 'confirmed', 'failed','cancelled']  # Include orders with status "New", "confirmed", or "failed"
     ).annotate(
         latest_created_at=F('created_at')
     ).order_by('-latest_created_at').prefetch_related('orderproduct_set', 'address')
