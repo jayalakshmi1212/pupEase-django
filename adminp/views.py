@@ -167,6 +167,7 @@ def update_order_status(request):
 ##############################################
 from django.db.models.functions import Cast
 from django.db.models import Sum, FloatField
+@login_required(login_url='adminp:admin_login')
 def adminhome(request):
     Products = Product.objects.all()
     orders = Order.objects.filter(is_ordered=True)
@@ -460,14 +461,14 @@ def coupon_button_text(is_active):
 
 #________________________________________brand_______________________________________________#
 
-@login_required
+@login_required(login_url='adminp:admin_login')
 def all_brand(request):
     brd = Brand.objects.all()
     context = { 'brd':brd }
     return render(request,'adminp/all_brand.html',context)
 
 
-@login_required
+@login_required(login_url='adminp:admin_login')
 def create_brand(request):
     if request.method == 'POST':
         brand = request.POST.get('brand')
@@ -478,7 +479,7 @@ def create_brand(request):
 
 
 
-@login_required
+@login_required(login_url='adminp:admin_login')
 def toggle_brand_active(request, brand_id):
     brand = get_object_or_404(Brand, pk=brand_id)
     if request.method == 'POST':
@@ -490,7 +491,7 @@ def toggle_brand_active(request, brand_id):
         # If the request method is not POST, return an error JSON response
         return JsonResponse({'error': 'Invalid request method'})
 
-@login_required
+@login_required(login_url='adminp:admin_login')
 def delete_brand(request, brand_id):
     brand = get_object_or_404(Brand, pk=brand_id)
     is_active = brand.is_active  # Store the current active status
