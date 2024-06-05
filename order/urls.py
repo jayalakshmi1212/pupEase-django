@@ -15,5 +15,7 @@ urlpatterns = [
      path('generate-pdf/<str:order_number>/', views.generate_pdf, name='generate_pdf'),
     path('paymenthandler/',views.paymenthandler,name='paymenthandler'),
     path('failedpayments/',views.Failedpayments,name='failedpayments'),
+    path('return_order/<int:order_id>/', views.return_order, name='return_order'),
+    
     
 ]

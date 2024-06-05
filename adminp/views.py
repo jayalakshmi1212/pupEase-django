@@ -120,6 +120,10 @@ def change_order_status(request):
         new_status = request.POST.get('new_status')
         order = Order.objects.get(id=order_id)
         order.status = new_status
+        # Update the status of the order
+        order.status = new_status
+        if new_status == 'Delivered':
+            order.deliverd_at = timezone.now()
         order.save()
     return redirect('adminp:order_list')
 
@@ -149,11 +153,14 @@ def update_order_status(request):
 
         # Fetch the order object
         order = Order.objects.get(pk=order_id)
-
-        # Update the status of the order
+          # Update the status of the order
         order.status = status
+        if status == 'Delivered':
+            order.deliverd_at = timezone.now()
         order.save()
 
+
+       
         # Redirect back to the admin order detail page
         return redirect('adminp:admin_order_detail', order_number=order.order_number)
     else:

@@ -69,8 +69,8 @@ class Shipping_Addresses(models.Model):
         return self.name    
 
 
-
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 class Order(models.Model):
     STATUS = (
         ('New', 'New'),
@@ -103,9 +103,9 @@ class Order(models.Model):
         return f"Order {self.id} (No Address)"
 
     def can_return_products(self):
-        if self.delivered_at:
+        if self.deliverd_at:
             current_date = timezone.now()
-            return self.delivered_at + timedelta(days=3) >= current_date
+            return self.deliverd_at + timedelta(days=3) >= current_date
         return False
    
     def save(self, *args, **kwargs):
@@ -113,6 +113,10 @@ class Order(models.Model):
             # Generate a unique order number if it's not already set
             self.order_number = get_random_string(length=10)
         super().save(*args, **kwargs)
+    def can_return_products(self):
+        # Define the logic to check if products can be returned
+        return self.status == 'Delivered' and self.deliverd_at is not None
+
 #
 from django.db.models import Sum
 

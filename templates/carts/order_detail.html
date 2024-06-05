@@ -91,7 +91,17 @@
                                             <td style="color: {% if order.status == 'confirmed' %} green {% elif order.status == 'cancelled' %} red {% else %} black {% endif %};" >{{ order.status }} </td>
 
                                             <td>{{payment_method}}</td>
-                                            <td><a href="#" id="cancelOrderBtn">Cancel</a></td>
+                                            <td>
+                                                {% if order.status == 'Delivered' %}
+                                                    {% if order.can_return_products %}
+                                                        <a href="#" id="cancelOrderBtn">Return</a>
+                                                    {% else %}
+                                                        Cannot return
+                                                    {% endif %}
+                                                {% else %}
+                                                    <a href="#" id="cancelOrderBtn">Cancel</a>
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -143,6 +153,7 @@
     </div>
 </div>
 
+
 <script>
     // Function to handle cancel/return button behavior
     function handleCancelReturnButton(orderStatus) {
@@ -153,7 +164,7 @@
             cancelBtn.disabled = true;
             // Change button text to "Cancelled"
             cancelBtn.innerText = "Cancelled";
-        } else if (orderStatus === "delivered") {
+        } else if (orderStatus === "Delivered") {
             // Enable the button
             cancelBtn.disabled = false;
             // Change button text to "Return"
@@ -172,7 +183,7 @@
     // Handle click event on cancel button/link
     document.getElementById("cancelOrderBtn").addEventListener("click", function() {
         // Check if the order status is not already "cancelled" or "delivered"
-        if ("{{ order.status }}" !== "cancelled" && "{{ order.status }}" !== "delivered") {
+        if ("{{ order.status }}" !== "cancelled" && "{{ order.status }}" !== "Delivered") {
             // Show the modal
             $('#cancelOrderModal').modal('show');
         }

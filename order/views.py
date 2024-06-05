@@ -93,7 +93,7 @@ def payment(request): #this is order success page
     # Mark order as ordered
     # Calculate the delivery date (5 days after the order date)
     delivery_date = timezone.now() + timedelta(days=5)
-    order.delivered_at = delivery_date
+    order.deliverd_at = delivery_date
     order.save()
     if 'discounted_total' in request.session:
        del request.session['discounted_total']
@@ -163,7 +163,7 @@ def user_orders(request):
     user = request.user
     orders = Order.objects.filter(
         user=user,
-        status__in=['New', 'confirmed', 'failed','cancelled']  # Include orders with status "New", "confirmed", or "failed"
+        status__in=['New', 'confirmed', 'failed','cancelled','Delivered']  # Include orders with status "New", "confirmed", or "failed"
     ).annotate(
         latest_created_at=F('created_at')
     ).order_by('-latest_created_at').prefetch_related('orderproduct_set', 'address')
@@ -232,6 +232,20 @@ def order_detail(request, order_number):
     }
     return render(request, 'carts/order_detail.html', context)
 
+def return_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    if request.method == 'POST':
+        if order.can_return_products():
+            # Perform the return action here
+            order.status = 'Returned'
+            order.returned_at = timezone.now()
+            order.save()
+            messages.success(request, f"Order {order.order_number} has been returned successfully.")
+        else:
+            messages.error(request, f"You cannot return this order anymore.")
+    
+    return redirect('cart:order_detail', order_id=order.id)
 
 def cancel_order(request, order_number):
     print('order/cancel_orde')
