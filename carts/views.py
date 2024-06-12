@@ -173,6 +173,7 @@ def checkout(request):
     grand_total = 0
     selected_address = None
     
+    
 
 
    
@@ -192,6 +193,7 @@ def checkout(request):
        
         discount_percentage = request.session.get('discount_percentage', 0)
         discounted_total = request.session.get('discounted_total')
+        
         if discounted_total:
             grand_total = discounted_total
             discount_amount = discount_percentage 

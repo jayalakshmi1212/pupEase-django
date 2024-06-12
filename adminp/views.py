@@ -330,7 +330,7 @@ class SalesReportPDFView(View):
         status='SUCCESS',
         created_at__month=current_month
         )
-        monthly_revenue = monthly_payments.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+       
 
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
@@ -356,7 +356,7 @@ class SalesReportPDFView(View):
             'revenue_total' : revenue_total,
             # 'd_month' :delivered_orders_this_month,
             'd_month_len' : len(monthly_payments),
-            'revenue_this_month' : monthly_revenue,
+            
             'all_orders': all_orders,  # Pass filtered orders to the template
 
         }
