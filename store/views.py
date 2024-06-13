@@ -52,8 +52,7 @@ def shop(request):
     # Query the Product model
     products = Product.objects.filter(is_active=True)
     brands = Brand.objects.filter(is_active=True)
-   
-    
+    print(products.values_list())
     # Search functionality
     search_query = request.GET.get('q')
     if search_query:

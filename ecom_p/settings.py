@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xq2ap%l#39c8rcxs(1xftrq-pfe8e$5&ek(#)5vr&y!77&mpyj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG =False
 
 ALLOWED_HOSTS = ['*']
 
@@ -170,3 +170,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 RAZOR_PAY_KEY_ID ="rzp_test_fGwLaAdAhjOjbm"
 KEY_SECRET = "7qO0FhI7y3SZGPpikcUEvVf1"
+
+
+
+
