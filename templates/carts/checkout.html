@@ -191,10 +191,10 @@
                                         <td class="cart_total_label">Shipping</td>
                                         <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
                                     </tr>
-                                    <!-- <tr>
-                                        <td class="cart_total_label">Coupon Discount Percentage</td>
-                                        <td class="cart_total_amount"><span class="font-lg fw-900 text-brand" id="couponDiscountPercentage">0%</span></td>
-                                    </tr> -->
+                                    <tr>
+                                        <td>Coupon Discount:</td>
+                                        <td><span id="discountPercentage">0%</span></td>
+                                    </tr>
                                     <tr>
                                         <td class="cart_total_label">Total</td>
                                         <td class="cart_total_amount">
@@ -508,6 +508,8 @@ document.getElementById("couponForm").addEventListener("submit", function(event)
         var discountPercentage = data.discount_percentage;
         updateTotal(newTotalPrice,discountPercentage);
         console.log("Coupon applied successfully!");
+        // Close the modal
+        modal.style.display = "none";
     } else {
         // Display error message if coupon is invalid
         console.error("Invalid coupon code:", data.message);
@@ -595,6 +597,61 @@ function updateTotal(newTotal) {
 
 // Fetch available coupons and populate the select dropdown
 
+
+</script>
+<script>
+    // Handle form submission to apply coupon
+document.getElementById("couponForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    var couponCode = document.getElementById("couponCode").value;
+    console.log("Coupon Code:", couponCode);
+
+    // Simulate success response for demonstration
+    var data = {
+        success: true,
+        discount_percentage: 10,
+    };
+
+    // Check if the coupon is valid
+    if (data.success) {
+        // Update coupon discount display
+        updateDiscountPercentage(data.discount_percentage);
+        console.log("Coupon applied successfully!");
+    } else {
+        // Display error message if coupon is invalid
+        console.error("Invalid coupon code:", data.message);
+    }
+});
+
+// Add an event listener to the Remove Coupon button
+document.querySelector('.remove-coupon-btn').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Simulate success response for demonstration
+    var data = {
+        success: true,
+    };
+
+    // Check if the coupon was successfully removed
+    if (data.success) {
+        // Reset coupon discount display to zero
+        updateDiscountPercentage(0);
+        console.log("Coupon removed successfully!");
+    } else {
+        console.error("Failed to remove coupon:", data.message);
+    }
+});
+
+// Function to update the coupon discount percentage display
+function updateDiscountPercentage(discountPercentage) {
+    var discountPercentageElement = document.getElementById('discountPercentage');
+    if (discountPercentageElement) {
+        discountPercentageElement.innerText = discountPercentage + '%';
+    } else {
+        console.error('Discount percentage element not found in the DOM');
+    }
+}
 
 </script>
 

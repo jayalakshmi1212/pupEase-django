@@ -540,7 +540,8 @@ class RemoveCouponView(View):
         if 'discounted_total' in request.session:
             del request.session['discounted_total']
             request.session.modified = True
-        
+        if 'discount_percentage' in request.session:
+            del request.session['discount_percentage']
         # Return a JSON response indicating success
         return JsonResponse({'success': True})
     
@@ -549,6 +550,8 @@ def remove_coupon(request):
     print('enter remove_coupon')
     try:
         del request.session['discounted_total']  # Remove the discounted total from the session
+        del request.session['discount_percentage']
+
 
         # Recalculate the total price without the coupon discount
         # You need to implement this logic based on your models

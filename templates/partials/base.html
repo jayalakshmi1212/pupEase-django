@@ -237,7 +237,7 @@
                                         <span id="cart-count" class="pro-count blue">{{cart_count}}</span>
                                     </a>
                                     
-                                    
+                            
                                     
 
 
@@ -306,7 +306,7 @@
             <div class="container">
                 <div class="header-wrap header-space-between position-relative">
                     <div class="logo logo-width-1 d-block d-lg-none">
-                        <a href="index.html"><img src="{% static 'assets/imgs/theme/logo.svg' %}" alt="logo"></a>
+                        <a href="index.html"><img src="{%static  'assets/imgs/banner/pupease-high-resolution-logo-black-transparent.png'%}" alt="logo"style="width: 20%;"></a>
                     </div>
                     <div class="header-nav d-none d-lg-flex">
                         <div class="main-categori-wrap d-none d-lg-block">
@@ -340,15 +340,15 @@
                     <div class="header-action-right d-block d-lg-none">
                         <div class="header-action-2">
                             <div class="header-action-icon-2">
-                                <a href="shop-wishlist.html">
-                                    <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}">
-                                    <span class="pro-count white">4</span>
+                                <a href="{%url 'store:wishlist' %}">
+                                    <img class="svgInject" alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}">
+                                    <span class="pro-count blue">{{wishlist_count}}</span>
                                 </a>
                             </div>
                             <div class="header-action-icon-2">
-                                <a class="mini-cart-icon" href="shop-cart.html">
+                                <a class="mini-cart-icon" href="{% url 'cart:cart' %}">
                                     <img alt="Evara" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}">
-                                    <span class="pro-count white">2</span>
+                                    <span id="cart-count" class="pro-count blue">{{cart_count}}</span>
                                 </a>
                                 <div class="cart-dropdown-wrap cart-dropdown-hm2">
                                     <ul>
