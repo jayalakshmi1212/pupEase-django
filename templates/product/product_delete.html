@@ -4,13 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delete Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #343a40;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        h1 {
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .confirm {
+            background-color: #dc3545;
+            color: white;
+        }
+        .confirm:hover {
+            background-color: #c82333;
+        }
+        .cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+        .cancel:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
 <body>
-    <h1>Delete Product</h1>
-    <p>Are you sure you want to delete {{ product.name }}?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Confirm Delete</button>
-    </form>
+    <div class="container">
+        <h1>Delete Product</h1>
+        <p>Are you sure you want to delete <strong>{{ product.name }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="button-group">
+                <button type="submit" class="confirm">Confirm Delete</button>
+                <button type="button" class="cancel" onclick="window.history.back();">Cancel</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
