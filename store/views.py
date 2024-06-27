@@ -296,8 +296,8 @@ def editprofile(request):
         else:
             error = form.errors
             context = {'form':form, 'error':error}
-            return render(request, 'profile\edit-profile.html',context)
-    return render(request, 'profile\edit-profile.html',{'form':form})
+            return render(request, 'profile/edit-profile.html',context)
+    return render(request, 'profile/edit-profile.html',{'form':form})
 
 
 
